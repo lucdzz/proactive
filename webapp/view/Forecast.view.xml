@@ -1,0 +1,77 @@
+<mvc:View controllerName="zpg.mrp.ui.controller.Forecast"
+
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    displayBlock="true">
+
+    <Page id="fcst_pageMain" title="Forecast Demand (UC-02)">
+        <headerContent>
+            <Button id="fcst_btnBack" icon="sap-icon://home" text="Home" press="onNavHome"/>
+            <Button id="fcst_btnRunForecast" icon="sap-icon://synchronize" text="Run Forecast" type="Emphasized" press="onRunForecast"/>
+            <Button id="fcst_btnSaveForecast" icon="sap-icon://save" text="Save" press="onSaveForecast"/>
+            <!-- <Button id="fcst_btnProposal" icon="sap-icon://create-form" text="Generate Proposal" press="onNavProposal"/> -->
+        </headerContent>
+
+        <content>
+            <VBox id="fcst_boxMain" class="sapUiSmallMargin">
+                <!-- Bộ lọc -->
+                <HBox id="fcst_boxFilter" alignItems="Center" justifyContent="Start" class="sapUiTinyMarginBottom">
+                    <Select id="fcst_selMethod" width="200px" selectedKey="MA" change="onMethodChange">
+                        <core:Item id="fcst_itmMA" key="MA" text="Moving Average"/>
+                        <core:Item id="fcst_itmWA" key="WA" text="Weighted Average"/>
+                        <core:Item id="fcst_itmAR" key="AR" text="ARIMA (coming soon)"/>
+                    </Select>
+
+                    <Select id="fcst_selPeriod" width="150px" selectedKey="M" change="onMethodChange">
+                        <core:Item id="fcst_itmMonth" key="M" text="Month"/>
+                        <core:Item id="fcst_itmWeek" key="W" text="Week"/>
+                    </Select>
+
+                    <Button id="fcst_btnSimulate" icon="sap-icon://simulate" text="Simulate" press="onSimulate"/>
+                </HBox>
+
+                <!-- Bảng kết quả -->
+                <Table id="fcst_tblForecast" inset="false" width="100%">
+    <headerToolbar>
+        <Toolbar id="fcst_toolbarHeader">
+            <Title id="fcst_titleHeader" text="Forecast History &amp; Result"/>
+        </Toolbar>
+    </headerToolbar>
+
+    <columns>
+        <Column id="fcst_colMatnr"><Text id="fcst_txtHdrMatnr" text="Material"/></Column>
+        <Column id="fcst_colWerks"><Text id="fcst_txtHdrWerks" text="Plant"/></Column>
+        <Column id="fcst_colPeriod"><Text id="fcst_txtHdrPeriod" text="Period"/></Column>
+        <Column id="fcst_colMethod"><Text id="fcst_txtHdrMethod" text="Method"/></Column>
+        <Column id="fcst_colWindow"><Text id="fcst_txtHdrWindow" text="Month"/></Column>
+        <Column id="fcst_colQty"><Text id="fcst_txtHdrQty" text="Forecast Qty"/></Column>
+        <Column id="fcst_colAedat"><Text id="fcst_txtHdrAedat" text="Changed On"/></Column>
+    </columns>
+
+    <!-- Template cho từng dòng -->
+    <items>
+        <ColumnListItem id="fcst_rowTemplate">
+            <cells>
+                <Text id="fcst_txtMatnr" text="{Matnr} - {MaterialName}"/>
+                <Text id="fcst_txtWerks" text="{Werks} - {PlantName}"/>
+                <Text id="fcst_txtPeriod" text="{Period}"/>
+                <Text id="fcst_txtMethod" text="{Method}"/>
+                <Text id="fcst_txtWindow" text="{Window}"/>
+                <Text id="fcst_txtFcstQty" text="{FcstQty}"/>
+                <Text id="fcst_txtAedat" text="{Aedat}"/>
+                        </cells>
+                        </ColumnListItem>
+    </items>
+                </Table>
+            </VBox>
+            <!-- ✅ Phân trang -->
+<HBox id="fcst_boxPager" justifyContent="Center" class="sapUiMediumMarginTop">
+    <Button id="fcst_btnPrev" text="Previous" icon="sap-icon://navigation-left-arrow" press="onPrevPage"/>
+    <Text id="fcst_txtPageInfo" text="Page 1 / 1" class="sapUiTinyMarginBegin sapUiTinyMarginEnd"/>
+    <Button id="fcst_btnNext" text="Next" icon="sap-icon://navigation-right-arrow" press="onNextPage"/>
+</HBox>
+
+        </content>
+    </Page>
+</mvc:View>

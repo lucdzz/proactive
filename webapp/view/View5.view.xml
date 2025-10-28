@@ -1,0 +1,116 @@
+<mvc:View
+    controllerName="project2.controller.View5"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    displayBlock="true">
+
+    <Page id="pageReport" title="Report &amp; Alert (UC-05)">
+        <headerContent>
+            <Button id="btnBackApproval" icon="sap-icon://nav-back" text="Back" press="onNavBack"/>
+            <Button id="btnExportExcel" icon="sap-icon://excel-attachment" text="Export Excel" press="onExportExcel"/>
+            <Button id="btnPrintSmartform" icon="sap-icon://print" text="Print Report" press="onPrintSmartform"/>
+            <Button id="btnSendMail" icon="sap-icon://email" text="Send Email" press="onSendMail"/>
+        </headerContent>
+
+        <content>
+            <IconTabBar id="tabReport" expandable="false">
+                <!-- TAB 1: Shortage Items -->
+                <items>
+                    <IconTabFilter id="tabShortage" text="Shortage Items" icon="sap-icon://alert">
+                        <Table id="tblShortage" inset="false">
+                            <headerToolbar>
+                                <Toolbar id="toolbarShortage">
+                                    <Title id="titleShortage" text="Top Materials with Net Requirement &lt; 0"/>
+                                </Toolbar>
+                            </headerToolbar>
+                            <columns>
+                                <Column id="colRptMatnr"><Text id="txtHdrRptMatnr" text="Material"/></Column>
+                                <Column id="colRptDesc"><Text id="txtHdrRptDesc" text="Description"/></Column>
+                                <Column id="colRptPlant"><Text id="txtHdrRptPlant" text="Plant"/></Column>
+                                <Column id="colRptNet"><Text id="txtHdrRptNet" text="Net Requirement"/></Column>
+                                <Column id="colRptRisk"><Text id="txtHdrRptRisk" text="Risk Level"/></Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem id="rowRpt1">
+                                    <cells>
+                                        <Text id="txtRptMatnr1" text="XMANG001"/>
+                                        <Text id="txtRptDesc1" text="Xi măng"/>
+                                        <Text id="txtRptPlant1" text="1000"/>
+                                        <Text id="txtRptNet1" text="-1000"/>
+                                        <ObjectStatus id="stsRptRisk1" text="High" state="Error"/>
+                                    </cells>
+                                </ColumnListItem>
+                                <ColumnListItem id="rowRpt2">
+                                    <cells>
+                                        <Text id="txtRptMatnr2" text="CAT001"/>
+                                        <Text id="txtRptDesc2" text="Cát xây dựng"/>
+                                        <Text id="txtRptPlant2" text="1000"/>
+                                        <Text id="txtRptNet2" text="-200"/>
+                                        <ObjectStatus id="stsRptRisk2" text="Medium" state="Warning"/>
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                    </IconTabFilter>
+
+                    <!-- TAB 2: Approved Proposals -->
+                    <IconTabFilter id="tabApproved" text="Approved Proposals" icon="sap-icon://approvals">
+                        <Table id="tblApproved" inset="false">
+                            <headerToolbar>
+                                <Toolbar id="toolbarApproved">
+                                    <Title id="titleApproved" text="Proposals Approved and Released"/>
+                                </Toolbar>
+                            </headerToolbar>
+                            <columns>
+                                <Column id="colApvMatnr"><Text id="txtHdrApvMatnr" text="Material"/></Column>
+                                <Column id="colApvQty"><Text id="txtHdrApvQty" text="Qty"/></Column>
+                                <Column id="colApvType"><Text id="txtHdrApvType" text="Type"/></Column>
+                                <Column id="colApvDate"><Text id="txtHdrApvDate" text="Approved On"/></Column>
+                                <Column id="colApvUser"><Text id="txtHdrApvUser" text="Approved By"/></Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem id="rowApv1">
+                                    <cells>
+                                        <Text id="txtApvMatnr1" text="XMANG001"/>
+                                        <Text id="txtApvQty1" text="3000"/>
+                                        <Text id="txtApvType1" text="PR"/>
+                                        <Text id="txtApvDate1" text="07.10.2025"/>
+                                        <Text id="txtApvUser1" text="QLKHO"/>
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                    </IconTabFilter>
+
+                    <!-- TAB 3: Email Alerts -->
+                    <IconTabFilter id="tabMail" text="Email Alerts Log" icon="sap-icon://email">
+                        <Table id="tblMail" inset="false">
+                            <headerToolbar>
+                                <Toolbar id="toolbarMail">
+                                    <Title id="titleMail" text="Auto Email Notifications Sent"/>
+                                </Toolbar>
+                            </headerToolbar>
+                            <columns>
+                                <Column id="colMailDate"><Text id="txtHdrMailDate" text="Date Sent"/></Column>
+                                <Column id="colMailTo"><Text id="txtHdrMailTo" text="Recipient"/></Column>
+                                <Column id="colMailSubject"><Text id="txtHdrMailSubject" text="Subject"/></Column>
+                                <Column id="colMailStatus"><Text id="txtHdrMailStatus" text="Status"/></Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem id="rowMail1">
+                                    <cells>
+                                        <Text id="txtMailDate1" text="07.10.2025"/>
+                                        <Text id="txtMailTo1" text="procurement@company.com"/>
+                                        <Text id="txtMailSubject1" text="MRP Alert: Cement &amp; Sand Shortage"/>
+                                        <ObjectStatus id="stsMailStatus1" text="Delivered" state="Success"/>
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                    </IconTabFilter>
+                </items>
+            </IconTabBar>
+        </content>
+    </Page>
+</mvc:View>

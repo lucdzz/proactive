@@ -1,0 +1,22 @@
+<mvc:View
+    controllerName="zpg.mrp.ui.controller.Login"
+    xmlns="sap.m"
+    xmlns:mvc="sap.ui.core.mvc">
+
+    <Page id="pageLogin" title="🔐 Đăng nhập Hệ thống MRP">
+        <content>
+            <VBox
+                id="boxLogin"
+                class="sapUiMediumMargin sapUiSmallMarginTop"
+                alignItems="Center"
+                justifyContent="Center">
+
+                <Title id="titleApp" text="Proactive MRP System" level="H2"/>
+                <Input id="inpUser" placeholder="Tên đăng nhập" width="250px"/>
+                <Input id="inpPass" placeholder="Mật khẩu" type="Password" width="250px"/>
+                <Button id="btnLogin" text="Đăng nhập" type="Emphasized" press="onLogin" width="250px"/>
+
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

@@ -1,0 +1,132 @@
+<mvc:View 
+    controllerName="zpg.mrp.ui.controller.DashBoard"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:viz="sap.viz.ui5.controls"
+    xmlns:viz.data="sap.viz.ui5.data"
+    xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
+    displayBlock="true">
+
+    <Page id="dashboardPage" title="Dashboard Kế hoạch Vật tư (ZMRP_DASHBOARD)">
+        <headerContent>
+            <!-- <Button id="btnNavMonitor" text="MRP Monitor" type="Emphasized" icon="sap-icon://factory" press="onNavMonitor"/>
+            <Button id="btnNavForecast" text="Forecast" icon="sap-icon://trend-up" press="onNavForecast"/>
+            <Button id="btnNavProposal" text="Proposal" icon="sap-icon://create" press="onNavProposal"/>
+            <Button id="btnNavApproval" text="Approval List" icon="sap-icon://workflow-tasks" press="onNavApproval"/> -->
+            <Button id="btnLogout" text="Logout" icon="sap-icon://log" type="Reject" press="onLogout"/>
+        </headerContent>
+
+        <content>
+            <!-- 🔹 Khu vực KPI -->
+            <HBox id="dashboardTilesBox"
+                  justifyContent="SpaceAround"
+                  alignItems="Center"
+                  class="sapUiLargeMarginBottom sapUiMediumMarginTop">
+
+                <!-- KPI 1️⃣ -->
+                <GenericTile id="tileMonitor"
+                             header="Theo dõi Tồn kho &amp; Nhu cầu (UC-01)"
+                             subheader="Stock &amp; Demand Monitor"
+                             press="onNavMonitor"
+                             class="sapUiTinyMargin"
+                             visible="false">
+                    <TileContent id="tileContentMonitor" footer="ZMRP_DIFF Overview">
+                        <NumericContent id="numMonitor"
+                                        value="128"
+                                        scale="Items"
+                                        indicator="Up"
+                                        valueColor="Good"
+                                        withMargin="false"/>
+                    </TileContent>
+                </GenericTile>
+
+                <!-- KPI 2️⃣ -->
+                <GenericTile id="tileForecast"
+                             header="Dự báo Nhu cầu (UC-02)"
+                             subheader="Forecast Accuracy"
+                             press="onNavForecast"
+                             class="sapUiTinyMargin"
+                             visible="false">
+                    <TileContent id="tileContentForecast" unit="%" footer="MAPE ≤ 5%">
+                        <NumericContent id="numForecast"
+                                        value="92.5"
+                                        scale="%"
+                                        indicator="Up"
+                                        valueColor="Good"
+                                        withMargin="false"/>
+                    </TileContent>
+                </GenericTile>
+
+                <!-- KPI 3️⃣ -->
+                <GenericTile id="tileProposal"
+                             header="Đề xuất Mua hàng / SX (UC-03)"
+                             subheader="Generated Proposals"
+                             press="onNavProposal"
+                             class="sapUiTinyMargin"
+                             visible="false">
+                    <TileContent id="tileContentProposal" footer="ZMRP_PROPOSAL Records">
+                        <NumericContent id="numProposal"
+                                        value="8"
+                                        scale="items"
+                                        indicator="Up"
+                                        valueColor="Critical"
+                                        withMargin="false"/>
+                    </TileContent>
+                </GenericTile>
+
+                <!-- KPI 4️⃣ -->
+                <GenericTile id="tileApproval"
+                             header="Yêu cầu Phê duyệt (UC-04)"
+                             subheader="Pending Approvals"
+                             press="onNavApproval"
+                             class="sapUiTinyMargin"
+                             visible="false">
+                    <TileContent id="tileContentApproval" footer="Waiting WF Level 1">
+                        <NumericContent id="numApproval"
+                                        value="4"
+                                        scale="items"
+                                        indicator="Down"
+                                        valueColor="Error"
+                                        withMargin="false"/>
+                    </TileContent>
+                </GenericTile>
+            </HBox>
+
+            <!-- 🔹 Biểu đồ phân tích -->
+            <Panel id="panelTrend" headerText="Phân tích Xu hướng Tồn kho" expandable="true" expanded="true">
+                <VBox id="boxTrend" class="sapUiMediumMargin">
+                    <viz:VizFrame id="vizStockTrend"
+              uiConfig="{applicationSet:'fiori'}"
+              vizType="line"
+              height="350px"
+              width="100%">
+    <viz:dataset>
+        <viz.data:FlattenedDataset id="dsStockTrend" data="{/StockTrend}">
+            <viz.data:dimensions>
+                <viz.data:DimensionDefinition id="dimPeriod" name="Kỳ" value="{Period}" />
+            </viz.data:dimensions>
+            <viz.data:measures>
+                <viz.data:MeasureDefinition id="meaActual" name="Tồn kho thực tế" value="{Actual}" />
+                <viz.data:MeasureDefinition id="meaForecast" name="Dự báo" value="{Forecast}" />
+            </viz.data:measures>
+        </viz.data:FlattenedDataset>
+    </viz:dataset>
+
+    <viz:feeds>
+        <viz.feeds:FeedItem id="feedCategory" uid="categoryAxis" type="Dimension" values="Kỳ" />
+        <viz.feeds:FeedItem id="feedValue" uid="valueAxis" type="Measure" values="Tồn kho thực tế,Dự báo" />
+    </viz:feeds>
+</viz:VizFrame>
+
+                </VBox>
+            </Panel>
+
+            <!-- 🔹 Footer -->
+            <Toolbar id="toolbarFooter" design="Transparent" class="sapUiTinyMarginTop">
+                <Title id="footerTitle" text="Proactive MRP System © 2025 — Integrated with ZGW_MRP_MONITOR_SRV" level="H6"/>
+                <ToolbarSpacer id="footerSpacer"/>
+                <Button id="btnRefreshDashboard" icon="sap-icon://refresh" text="Refresh KPI" press="onRefreshKPI"/>
+            </Toolbar>
+        </content>
+    </Page>
+</mvc:View>

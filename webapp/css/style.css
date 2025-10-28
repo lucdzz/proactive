@@ -1,0 +1,70 @@
+/* ================================
+   Global Styling for Entire App
+   ================================ */
+
+/* Font tiếng Việt, đồng bộ với SAP Horizon */
+html, body, .sapUiBody, .sapMText, .sapMLabel, .sapMBtnInner {
+  font-family: "Noto Sans", "Segoe UI", "Roboto", "Arial", sans-serif !important;
+  font-weight: 400;
+  color: #2e3a59;
+}
+
+/* Nền tổng thể nhẹ */
+.sapUiBody {
+  background-color: #f8f9fb !important;
+}
+
+/* Tiêu đề trang */
+.sapMTitle {
+  font-weight: 600;
+  color: #0a4275;
+}
+
+/* Giao diện card mặc định */
+.sapMPanel, .sapMList, .sapMListTbl {
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+/* Khoảng cách mặc định giữa các khối */
+.sapUiSmallMargin {
+  margin: 1rem !important;
+}
+
+/* --- Dashboard Card Styling --- */
+.dash_card {
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background-color: #fff;
+}
+.dash_card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* màu nền KPI */
+.dash_cardGood {
+  border-top: 5px solid #2ecc71;
+}
+.dash_cardAlert {
+  border-top: 5px solid #e74c3c;
+}
+.dash_cardWarning {
+  border-top: 5px solid #f39c12;
+}
+
+/* nội dung trung tâm trong card */
+.dash_cardContent {
+  text-align: center;
+  padding: 1rem 0;
+  font-size: 1.3rem;
+}
+
+/* Panel biểu đồ */
+.dash_chartCard {
+  background: #fafafa;
+  border-radius: 10px;
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.05);
+}

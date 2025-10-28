@@ -1,0 +1,90 @@
+<mvc:View controllerName="zpg.mrp.ui.controller.Approval"
+
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    displayBlock="true">
+
+    <Page id="appr_pageMain" title="Approval Center (UC-04)">
+        <headerContent>
+            <Button id="appr_btnBack" icon="sap-icon://home" text="Home" press="onNavHome"/>
+            <Button id="appr_btnApprove" icon="sap-icon://accept" text="Approve" type="Emphasized" press="onApprove"/>
+            <Button id="appr_btnReject" icon="sap-icon://decline" text="Reject" press="onReject"/>
+            <Button id="appr_btnAdjust" icon="sap-icon://edit" text="Adjust Qty" press="onAdjust"/>
+            <!-- <Button id="appr_btnReport" icon="sap-icon://business-objects-experience" text="Report &amp; Alert" press="onNavReport"/> -->
+        </headerContent>
+
+        <content>
+            <VBox id="appr_boxMain" class="sapUiSmallMargin">
+                <Table
+                    id="appr_tblProposal"
+                    inset="false"
+                    mode="MultiSelect"
+                    growing="true"
+                    growingScrollToLoad="true"
+                    items="{ path: '/ProposalSet', filters: [ { path: 'Status', operator: 'EQ', value1: 'N' } ] }"
+                    >
+
+                    <headerToolbar>
+                        <Toolbar id="appr_toolbarHeader">
+                            <Title id="appr_titleHeader" text="Pending Proposals for Approval"/>
+                            <ToolbarSpacer id="appr_spaceToolbar"/>
+                            <SearchField id="appr_search" width="250px" liveChange="onSearch"/>
+                        </Toolbar>
+                    </headerToolbar>
+
+                    <columns>
+                        <Column id="appr_colMatnr">
+                            <Text id="appr_txtHdrMatnr" text="Material"/>
+                        </Column>
+                        <Column id="appr_colDesc">
+                            <Text id="appr_txtHdrDesc" text="Description"/>
+                        </Column>
+                        <Column id="appr_colWerks">
+                            <Text id="appr_txtHdrWerks" text="Plant"/>
+                        </Column>
+                        <Column id="appr_colQty" hAlign="End">
+                            <Text id="appr_txtHdrQty" text="Proposal Qty"/>
+                        </Column>
+                        <Column id="appr_colUom">
+                            <Text id="appr_txtHdrUom" text="UoM"/>
+                        </Column>
+                        <Column id="appr_colPeriod">
+                            <Text id="appr_txtHdrPeriod" text="Period"/>
+                        </Column>
+                        <Column id="appr_colStatus">
+                            <Text id="appr_txtHdrStatus" text="Status"/>
+                        </Column>
+                        <Column id="appr_colRemark">
+                            <Text id="appr_txtHdrRemark" text="Remark"/>
+                        </Column>
+                    </columns>
+
+                    <items>
+                        <ColumnListItem id="appr_rowTemplate" type="Active">
+                            <cells>
+                                <Text id="appr_txtMatnr" text="{Matnr} - {MaterialName}"/>
+                                <Text id="appr_txtDesc" text="{Description}"/>
+                                <Text id="appr_txtWerks" text="{Werks} - {PlantName}"/>
+                                <ObjectNumber id="appr_objQty" number="{Qty}"/>
+                                <Text id="appr_txtUom" text="{Meins}"/>
+                                <Text id="appr_txtPeriod" text="{Period}"/>
+                                <ObjectStatus
+                                    id="appr_objStatus"
+                                    text="{
+                                        path: 'Status',
+                                        formatter: '.formatStatusText'
+                                    }"
+                                    state="{
+                                        path: 'Status',
+                                        formatter: '.formatStatusState'
+                                    }"/>
+                                <Text id="appr_txtRemark" text="{Remark}"/>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

@@ -1,0 +1,188 @@
+{
+  "_version": "1.48.0",
+  "sap.app": {
+    "id": "zpg.mrp.ui",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": {
+      "version": "0.0.1"
+    },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "resources": "resources.json",
+    "sourceTemplate": {
+      "id": "@sap/generator-fiori:basic",
+      "version": "1.19.0",
+      "toolsId": "2a3114f3-93f7-4495-bb62-0c8146520013"
+    },
+    "dataSources": {
+      "mainService": {
+        "uri": "/sap/opu/odata/sap/ZGW_MRP_MONITOR_SRV/",
+        "type": "OData",
+        "settings": {
+          "useBatch": true,
+          "annotations": [],
+          "localUri": "localService/mainService/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "",
+      "favIcon": "",
+      "phone": "",
+      "phone@2": "",
+      "tablet": "",
+      "tablet@2": ""
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": true,
+    "dependencies": {
+      "minUI5Version": "1.108.33",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {},
+        "sap.ui.layout": {},
+        "sap.f": {} 
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "zpg.mrp.ui.i18n.i18n"
+        }
+      },
+      "": {
+        "dataSource": "mainService",
+        "preload": true,
+        "settings": {},
+        "type": "sap.ui.model.odata.v2.ODataModel"
+      }
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "viewType": "XML",
+        "async": true,
+        "viewPath": "zpg.mrp.ui.view",
+        "controlAggregation": "pages",
+        "controlId": "app",
+        "clearControlAggregation": false
+      },
+      "routes": [
+        {
+          "name": "Login",
+          "pattern": "",
+          "target":["TargetLogin"]
+        },
+        {
+          "name": "DashBoard",
+          "pattern": "DashBoard",
+          "target":["TargetDashBoard"]
+        },
+        {
+          "name": "Monitor",
+          "pattern": "Monitor",
+          "target": ["TargetMonitor"]
+        },
+        {
+          "name": "Forecast",
+          "pattern": "Forecast",
+          "target": ["TargetForecast"]
+        },
+        {
+          "name": "Proposal",
+          "pattern": "Proposal",
+          "target": ["TargetProposal"]
+        },
+        {
+          "name": "Approval",
+          "pattern": "Approval",
+          "target": ["TargetApproval"]
+        },
+        {
+          "name": "View5",
+          "pattern": "report",
+          "target": ["TargetView5"]
+        }
+      ],
+      "targets": {
+        "TargetLogin":{
+          "viewType": "XML",
+          "transition":"slide",
+          "clearControlAggregation": false,
+          "viewId": "Login",
+          "viewName": "Login"
+        },
+        "TargetDashBoard":{
+          "viewType": "XML",
+          "transition":"slide",
+          "clearControlAggregation": false,
+          "viewId": "DashBoard",
+          "viewName": "DashBoard"
+        },
+        "TargetMonitor": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Monitor",
+          "viewName": "Monitor"
+        },
+        "TargetForecast": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Forecast",
+          "viewName": "Forecast"
+        },
+        "TargetProposal": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Proposal",
+          "viewName": "Proposal"
+        },
+        "TargetApproval": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Approval",
+          "viewName": "Approval"
+        },
+        "TargetView5": {
+          "viewType": "XML",
+          "transition": "slide",
+          "viewId": "View5",
+          "viewName": "View5"
+        }
+      }
+    },
+    "rootView": {
+      "viewName": "zpg.mrp.ui.view.App",
+      "type": "XML",
+      "async": true,
+      "id": "App"
+    }
+  }
+}

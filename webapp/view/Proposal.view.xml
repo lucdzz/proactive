@@ -1,0 +1,70 @@
+<mvc:View controllerName="zpg.mrp.ui.controller.Proposal"
+
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    displayBlock="true">
+
+    <Page id="prop_pageMain" title="Proposal Generator (UC-03)">
+        <headerContent>
+            <Button id="prop_btnBack" icon="sap-icon://home" text="Home" press=".onNavHome"/>
+            <Button id="prop_btnGenerate" icon="sap-icon://create" text="Generate Proposal" type="Emphasized" press=".onGenerate"/>
+            <Button id="prop_btnSave" icon="sap-icon://save" text="Save to SAP" press=".onSaveProposal"/>
+            <!-- <Button id="prop_btnApproval" icon="sap-icon://approvals" text="Approval Center" press=".onNavApproval"/> -->
+        </headerContent>
+
+        <content>
+            <VBox id="prop_boxMain" class="sapUiSmallMargin">
+                <Table
+                    id="prop_tblProposal"
+                    inset="false"
+                    width="100%"
+                    mode="MultiSelect"
+                    growing="true"
+                    growingScrollToLoad="true">
+
+                    <headerToolbar>
+                        <Toolbar id="prop_toolbarHeader">
+                            <Title id="prop_titleHeader" text="Proposed Materials for Purchase / Production"/>
+                        </Toolbar>
+                    </headerToolbar>
+
+                    <columns>
+                        <Column id="prop_colMatnr"><Text id="prop_txtHdrMatnr" text="Material"/></Column>
+                        <Column id="prop_colWerks"><Text id="prop_txtHdrWerks" text="Plant"/></Column>
+                        <Column id="prop_colQty"><Text id="prop_txtHdrQty" text="Proposal Qty"/></Column>
+                        <Column id="prop_colMeins"><Text id="prop_txtHdrMeins" text="UoM"/></Column>
+                        <Column id="prop_colPeriod"><Text id="prop_txtHdrPeriod" text="Period"/></Column>
+                        <Column id="prop_colStatus"><Text id="prop_txtHdrStatus" text="Status"/></Column>
+                        <Column id="prop_colRemark"><Text id="prop_txtHdrRemark" text="Remark"/></Column>
+                    </columns>
+
+                    <items>
+                        <ColumnListItem id="prop_rowTemplate" type="Active">
+                            <cells>
+                                <Text id="prop_txtMatnr" text="{Matnr} - {MaterialName}"/>
+                                <Text id="prop_txtWerks" text="{Werks} - {PlantName}"/>
+                                <Input id="prop_inpQty" value="{Qty}" type="Number" width="90px"/>
+                                <Text id="prop_txtMeins" text="{Meins}"/>
+                                <Text id="prop_txtPeriod" text="{Period}"/>
+                                <ObjectStatus
+    id="prop_objStatus"
+    text="{path: 'Status', formatter: '.formatStatusText'}"
+    state="{path: 'Status', formatter: '.formatStatusState'}"
+    icon="{path: 'Status', formatter: '.formatStatusIcon'}"/>
+
+                                <Input id="prop_inpRemark" value="{Remark}" width="200px" placeholder="Enter note..."/>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+                <!-- ✅ Pagination -->
+                <HBox id="prop_boxPager" justifyContent="Center" class="sapUiMediumMarginTop">
+                    <Button id="prop_btnPrev" text="Previous" icon="sap-icon://navigation-left-arrow" press=".onPrevPage"/>
+                    <Text id="prop_txtPageInfo" text="Page 1 / 1" class="sapUiTinyMarginBegin sapUiTinyMarginEnd"/>
+                    <Button id="prop_btnNext" text="Next" icon="sap-icon://navigation-right-arrow" press=".onNextPage"/>
+                </HBox>
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>
