@@ -1,89 +1,233 @@
 <mvc:View controllerName="zpg.mrp.ui.controller.Approval"
-
     xmlns:mvc="sap.ui.core.mvc"
     xmlns:core="sap.ui.core"
     xmlns="sap.m"
-    displayBlock="true">
+    xmlns:l="sap.ui.layout"
+    xmlns:f="sap.ui.layout.form"
+    displayBlock="true"
+    height="100%">
 
-    <Page id="appr_pageMain" title="Approval Center (UC-04)">
+    <Page id="appr_pageMain" title="Approval Center (UC-04)" enableScrolling="false">
         <headerContent>
             <Button id="appr_btnBack" icon="sap-icon://home" text="Home" press="onNavHome"/>
             <Button id="appr_btnApprove" icon="sap-icon://accept" text="Approve" type="Emphasized" press="onApprove"/>
             <Button id="appr_btnReject" icon="sap-icon://decline" text="Reject" press="onReject"/>
             <Button id="appr_btnAdjust" icon="sap-icon://edit" text="Adjust Qty" press="onAdjust"/>
-            <!-- <Button id="appr_btnReport" icon="sap-icon://business-objects-experience" text="Report &amp; Alert" press="onNavReport"/> -->
         </headerContent>
 
         <content>
-            <VBox id="appr_boxMain" class="sapUiSmallMargin">
-                <Table
-                    id="appr_tblProposal"
-                    inset="false"
-                    mode="MultiSelect"
-                    growing="true"
-                    growingScrollToLoad="true"
-                    items="{ path: '/ProposalSet', filters: [ { path: 'Status', operator: 'EQ', value1: 'N' } ] }"
-                    >
+            <VBox id="appr_vboxMain" height="100%" fitContainer="true">
+                <!-- ====== FILTER BAR ====== -->
+                <VBox id="appr_boxFilter" class="sapUiSmallMargin">
+                    <HBox id="appr_hboxFilterRow" justifyContent="SpaceBetween" alignItems="Center">
+                        <Input id="appr_inpPlant" placeholder="Select Plant..." showValueHelp="true"
+                               valueHelpRequest="onValueHelpPlant" width="220px"/>
+                        <Input id="appr_inpMatnr" placeholder="Material Number..." showValueHelp="true"
+                               valueHelpRequest="onValueHelpMaterial" width="220px"/>
+                        <HBox id="appr_hboxPeriod" alignItems="Center">
+                            <Text id="appr_lblPeriod" text="Period:" class="sapUiTinyMarginEnd"/>
+                            <DatePicker id="appr_dpFrom" placeholder="From" width="130px"/>
+                            <DatePicker id="appr_dpTo" placeholder="To" width="130px" class="sapUiTinyMarginBegin"/>
+                        </HBox>
+                        <HBox id="appr_hboxStatus" alignItems="Center">
+                            <Text id="appr_txtStatusLabel" text="Status:" class="sapUiTinyMarginEnd"/>
+                            <Select id="appr_selStatusFilter" width="180px" selectedKey="ALL" change="onStatusChange">
+                                <items>
+                                    <core:Item id="appr_itmStatusAll" key="ALL" text="Tất cả"/>
+                                    <core:Item id="appr_itmStatusPending" key="PENDING" text=" Yêu cầu phê duyệt"/>
+                                    <core:Item id="appr_itmStatusApproved" key="APPROVED" text=" Đã phê duyệt"/>
+                                </items>
+                            </Select>
+                        </HBox>
+                        <Button id="appr_btnFilter" icon="sap-icon://filter" text="Apply Filter" press="onFilter"/>
+                    </HBox>
+                </VBox>
 
-                    <headerToolbar>
-                        <Toolbar id="appr_toolbarHeader">
-                            <Title id="appr_titleHeader" text="Pending Proposals for Approval"/>
-                            <ToolbarSpacer id="appr_spaceToolbar"/>
-                            <SearchField id="appr_search" width="250px" liveChange="onSearch"/>
-                        </Toolbar>
-                    </headerToolbar>
+                <!-- ===== MASTER–DETAIL LAYOUT ===== -->
+                <l:ResponsiveSplitter id="appr_rspSplitter" defaultPane="appr_paneMaster" height="calc(100vh - 260px)">
+                    <l:PaneContainer id="appr_paneContainer" orientation="Horizontal">
 
-                    <columns>
-                        <Column id="appr_colMatnr">
-                            <Text id="appr_txtHdrMatnr" text="Material"/>
-                        </Column>
-                        <Column id="appr_colDesc">
-                            <Text id="appr_txtHdrDesc" text="Description"/>
-                        </Column>
-                        <Column id="appr_colWerks">
-                            <Text id="appr_txtHdrWerks" text="Plant"/>
-                        </Column>
-                        <Column id="appr_colQty" hAlign="End">
-                            <Text id="appr_txtHdrQty" text="Proposal Qty"/>
-                        </Column>
-                        <Column id="appr_colUom">
-                            <Text id="appr_txtHdrUom" text="UoM"/>
-                        </Column>
-                        <Column id="appr_colPeriod">
-                            <Text id="appr_txtHdrPeriod" text="Period"/>
-                        </Column>
-                        <Column id="appr_colStatus">
-                            <Text id="appr_txtHdrStatus" text="Status"/>
-                        </Column>
-                        <Column id="appr_colRemark">
-                            <Text id="appr_txtHdrRemark" text="Remark"/>
-                        </Column>
-                    </columns>
+                        <!-- ========== MASTER TABLE ========== -->
+                        <l:SplitPane id="appr_paneMaster">
+                            <l:layoutData>
+                                <l:SplitterLayoutData id="appr_layoutMaster" size="100%" resizable="true"/>
+                            </l:layoutData>
 
-                    <items>
-                        <ColumnListItem id="appr_rowTemplate" type="Active">
-                            <cells>
-                                <Text id="appr_txtMatnr" text="{Matnr} - {MaterialName}"/>
-                                <Text id="appr_txtDesc" text="{Description}"/>
-                                <Text id="appr_txtWerks" text="{Werks} - {PlantName}"/>
-                                <ObjectNumber id="appr_objQty" number="{Qty}"/>
-                                <Text id="appr_txtUom" text="{Meins}"/>
-                                <Text id="appr_txtPeriod" text="{Period}"/>
-                                <ObjectStatus
-                                    id="appr_objStatus"
-                                    text="{
-                                        path: 'Status',
-                                        formatter: '.formatStatusText'
-                                    }"
-                                    state="{
-                                        path: 'Status',
-                                        formatter: '.formatStatusState'
-                                    }"/>
-                                <Text id="appr_txtRemark" text="{Remark}"/>
-                            </cells>
-                        </ColumnListItem>
-                    </items>
-                </Table>
+                            <VBox id="appr_vboxMaster" height="100%" fitContainer="true">
+                                <Table
+                                    id="appr_tblProposal"
+                                    mode="MultiSelect"
+                                    selectionChange=".onSelectProposal"
+                                    class="sapUiSizeCompact"
+                                    growing="false"
+                                    fixedLayout="false"
+                                    width="100%">
+
+                                    <headerToolbar>
+                                        <Toolbar id="appr_toolbarHeader">
+                                            <Title id="appr_titleHeader" text="Proposals for Approval" level="H2"/>
+                                            <ToolbarSpacer id="appr_spaceToolbar"/>
+                                            <SearchField id="appr_search" width="250px" liveChange="onSearch"/>
+                                        </Toolbar>
+                                    </headerToolbar>
+
+                                    <columns>
+                                        <Column id="appr_colMatnr" width="12%">
+                                            <Text id="appr_txtHdrMatnr" text="Material"/>
+                                        </Column>
+                                        <Column id="appr_colMatName" width="20%">
+                                            <Text id="appr_txtHdrMatName" text="Material Name"/>
+                                        </Column>
+                                        <Column id="appr_colWerks" width="10%">
+                                            <Text id="appr_txtHdrWerks" text="Plant"/>
+                                        </Column>
+                                        <Column id="appr_colPlantName" width="18%">
+                                            <Text id="appr_txtHdrPlantName" text="Plant Name"/>
+                                        </Column>
+                                        <Column id="appr_colQty" width="10%" hAlign="End">
+                                            <Text id="appr_txtHdrQty" text="Proposal Qty"/>
+                                        </Column>
+                                        <Column id="appr_colUom" width="8%">
+                                            <Text id="appr_txtHdrUom" text="UoM"/>
+                                        </Column>
+                                        <Column id="appr_colPeriod" width="10%">
+                                            <Text id="appr_txtHdrPeriod" text="Period"/>
+                                        </Column>
+                                        <Column id="appr_colStatus" width="12%">
+                                            <Text id="appr_txtHdrStatus" text="Status"/>
+                                        </Column>
+                                    </columns>
+
+                                    <items>
+                                        <ColumnListItem id="appr_rowTemplate" type="Active">
+                                            <cells>
+                                                <Text id="appr_txtMatnr" text="{Matnr}"/>
+                                                <Text id="appr_txtMatName" text="{MaterialName}" wrapping="true"/>
+                                                <Text id="appr_txtWerks" text="{Werks}"/>
+                                                <Text id="appr_txtPlantName" text="{PlantName}" wrapping="true"/>
+                                                <ObjectNumber id="appr_objQty" number="{Qty}" unit="{Meins}" emphasized="true" textAlign="End"/>
+                                                <Text id="appr_txtUom" text="{Meins}" textAlign="Center"/>
+                                                <Text id="appr_txtPeriod" text="{path:'Period',formatter:'.formatter.formatPeriod'}" textAlign="Center"/>
+                                                <ObjectStatus 
+                                                        id="appr_objStatus" 
+                                                        text="{path:'Status',formatter:'.formatter.statusText'}"
+                                                        state="{path:'Status',formatter:'.formatter.statusState'}"/>
+                                            </cells>
+                                        </ColumnListItem>
+                                    </items>
+                                </Table>
+                            </VBox>
+                        </l:SplitPane>
+
+                        <!-- ========== DETAIL PANEL ========== -->
+                        <l:SplitPane id="appr_paneDetail">
+                            <VBox id="appr_vboxDetail" height="100%" fitContainer="true">
+                                <ScrollContainer id="appr_detailArea" visible="false" height="100%" vertical="true" horizontal="false">
+                                    <VBox id="appr_vboxDetailContent" class="sapUiSmallMargin">
+                                        <!-- Header -->
+                                        <HBox id="appr_hboxDetailHeader" justifyContent="SpaceBetween" alignItems="Center" class="sapUiSmallMarginBottom">
+                                            <Title id="appr_titleDetail" text="{Matnr} - {MaterialName}" level="H2"/>
+                                            <Button id="appr_btnCloseDetail" 
+                                                    icon="sap-icon://decline" 
+                                                    tooltip="Close detail" 
+                                                    type="Transparent" 
+                                                    press=".onCloseDetail"/>
+                                        </HBox>
+
+                                        <!-- Attributes -->
+                                        <VBox id="appr_vboxDetailAttrs" class="sapUiSmallMarginBottom">
+                                            <HBox id="appr_hboxAttrs1">
+                                                <ObjectAttribute id="appr_attrPlant" title="Plant" text="{Werks} - {PlantName}" class="sapUiSmallMarginEnd"/>
+                                            </HBox>
+                                            <HBox id="appr_hboxAttrs2">
+                                                <ObjectAttribute id="appr_attrPeriod" title="Period" text="{path: 'Period', formatter: '.formatter.formatPeriod'}" class="sapUiSmallMarginEnd"/>
+                                                <ObjectAttribute id="appr_attrQty" title="Proposal Qty" text="{Qty} {Meins}"/>
+                                            </HBox>
+                                        </VBox>
+
+                                        <!-- Form -->
+                                        <f:Form id="appr_formDetail" editable="false">
+                                            <f:title><core:Title id="appr_formTitleDetail" text="Proposal Details"/></f:title>
+                                            <f:layout>
+                                                <f:ResponsiveGridLayout id="appr_layoutFormDetail"
+                                                    labelSpanXL="4" labelSpanL="4" labelSpanM="4" labelSpanS="12"
+                                                    columnsXL="1" columnsL="1" columnsM="1"/>
+                                            </f:layout>
+
+                                            <f:formContainers>
+                                                <f:FormContainer id="appr_formContainerDetail">
+                                                    <f:formElements>
+                                                        <f:FormElement id="appr_feMatnr" label="Material">
+                                                            <f:fields>
+                                                                <Text id="appr_txtDetailMatnr" text="{Matnr}"/>
+                                                            </f:fields>
+                                                        </f:FormElement>
+                                                        <f:FormElement id="appr_feMatName" label="Material Name">
+                                                            <f:fields>
+                                                                <Text id="appr_txtDetailMatName" text="{MaterialName}"/>
+                                                            </f:fields>
+                                                        </f:FormElement>
+                                                        <f:FormElement id="appr_fePrNumber" label="Pr Number">
+                                                            <f:fields>
+                                                                <Text id="appr_txtDetailPrNumber" text="{PrNumber}"/>
+                                                            </f:fields>
+                                                        </f:FormElement>
+                                                        <f:FormElement id="appr_fePlant" label="Plant">
+                                                            <f:fields>
+                                                                <Text id="appr_txtDetailPlant" text="{Werks}"/>
+                                                            </f:fields>
+                                                        </f:FormElement>
+                                                        <f:FormElement id="appr_fePlantName" label="Plant Name">
+                                                            <f:fields>
+                                                                <Text id="appr_txtDetailPlantName" text="{PlantName}"/>
+                                                            </f:fields>
+                                                        </f:FormElement>
+                                                        <f:FormElement id="appr_fePeriod" label="Period">
+                                                            <f:fields>
+                                                                <Text id="appr_txtDetailPeriod" text="{path: 'Period', formatter: '.formatter.formatPeriod'}"/>
+                                                            </f:fields>
+                                                        </f:FormElement>
+                                                        <f:FormElement id="appr_feQty" label="Proposal Qty">
+                                                            <f:fields>
+                                                                <ObjectNumber id="appr_objDetailQty" number="{Qty}" unit="{Meins}"/>
+                                                            </f:fields>
+                                                        </f:FormElement>
+                                                        <f:FormElement id="appr_feStatus" label="Status">
+                                                            <f:fields>
+                                                                <ObjectStatus
+                                                                    id="appr_objDetailStatus"
+                                                                    text="{path: 'Status', formatter: '.formatter.statusText'}"
+                                                                    state="{path: 'Status', formatter: '.formatter.statusState'}"/>
+                                                            </f:fields>
+                                                        </f:FormElement>
+                                                        <f:FormElement id="appr_feRemark" label="Remark">
+                                                            <f:fields>
+                                                                <Text id="appr_txtDetailRemark" text="{Remark}"/>
+                                                            </f:fields>
+                                                        </f:FormElement>
+                                                    </f:formElements>
+                                                </f:FormContainer>
+                                            </f:formContainers>
+                                        </f:Form>
+                                    </VBox>
+                                </ScrollContainer>
+                            </VBox>
+                        </l:SplitPane>
+                    </l:PaneContainer>
+                </l:ResponsiveSplitter>
+
+                <!-- ===== PAGINATION ===== -->
+                <HBox id="appr_pagerBox" justifyContent="Center" class="sapUiSmallMarginTop">
+                    <Button id="appr_btnPrev" text="Previous" icon="sap-icon://navigation-left-arrow" press="onPrevPage"/>
+                    <!-- <Text id="appr_txtPageInfo" text="Page 1 / 1" class="sapUiTinyMarginBegin sapUiTinyMarginEnd"/> -->
+                    <HBox id="appr_pageNumbers" class="sapUiTinyMarginBegin sapUiTinyMarginEnd"/>
+                    <Button id="appr_btnNext" text="Next" icon="sap-icon://navigation-right-arrow" press="onNextPage"/>
+                </HBox>
+
+                <!-- ===== FOOTNOTE ===== -->
+                <HBox id="appr_hboxNote" justifyContent="Center" class="sapUiTinyMarginTop">
+                    <Text id="appr_txtNote" text="* Proposals for approval management"/>
+                </HBox>
             </VBox>
         </content>
     </Page>

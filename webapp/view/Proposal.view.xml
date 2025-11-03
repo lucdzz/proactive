@@ -1,68 +1,216 @@
 <mvc:View controllerName="zpg.mrp.ui.controller.Proposal"
-
     xmlns:mvc="sap.ui.core.mvc"
     xmlns:core="sap.ui.core"
     xmlns="sap.m"
-    displayBlock="true">
+    xmlns:l="sap.ui.layout"
+    xmlns:f="sap.ui.layout.form"
+    displayBlock="true"
+    height="100%">
 
-    <Page id="prop_pageMain" title="Proposal Generator (UC-03)">
+    <Page id="prop_pageMain" title="Proposal Generator (UC-03)" enableScrolling="false">
         <headerContent>
             <Button id="prop_btnBack" icon="sap-icon://home" text="Home" press=".onNavHome"/>
-            <Button id="prop_btnGenerate" icon="sap-icon://create" text="Generate Proposal" type="Emphasized" press=".onGenerate"/>
+            <Button id="prop_btnGenerate" icon="sap-icon://create" text="Generate" type="Emphasized" press=".onGenerate"/>
             <Button id="prop_btnSave" icon="sap-icon://save" text="Save to SAP" press=".onSaveProposal"/>
-            <!-- <Button id="prop_btnApproval" icon="sap-icon://approvals" text="Approval Center" press=".onNavApproval"/> -->
         </headerContent>
 
         <content>
-            <VBox id="prop_boxMain" class="sapUiSmallMargin">
-                <Table
-                    id="prop_tblProposal"
-                    inset="false"
-                    width="100%"
-                    mode="MultiSelect"
-                    growing="true"
-                    growingScrollToLoad="true">
+            <VBox id="prop_vboxMain" height="100%" fitContainer="true">
+                <!-- ====== FILTER BAR ====== -->
+                <VBox id="prop_boxFilter" class="sapUiSmallMargin">
+                    <HBox id="prop_hboxFilterRow" justifyContent="SpaceBetween" alignItems="Center">
+                        <Input id="prop_inpPlant" placeholder="Select Plant..." showValueHelp="true"
+                               valueHelpRequest="onValueHelpPlant" width="220px"/>
+                        <Input id="prop_inpMatnr" placeholder="Material Number..." showValueHelp="true"
+                               valueHelpRequest="onValueHelpMaterial" width="220px"/>
+                        <HBox id="prop_hboxPeriod" alignItems="Center">
+                            <Text id="prop_lblPeriod" text="Period:" class="sapUiTinyMarginEnd"/>
+                            <DatePicker id="prop_dpFrom" placeholder="From" width="130px"/>
+                            <DatePicker id="prop_dpTo" placeholder="To" width="130px" class="sapUiTinyMarginBegin"/>
+                        </HBox>
+                        <HBox id="prop_hboxStatus" alignItems="Center">
+                            <Text id="prop_txtStatusLabel" text="Status:" class="sapUiTinyMarginEnd"/>
+                            <Select id="prop_selStatusFilter" width="160px" selectedKey="ALL" change="onStatusChange">
+                                <items>
+                                    <core:Item id="prop_itmStatusAll" key="ALL" text="All"/>
+                                    <core:Item id="prop_itmStatusN" key="N" text="Chưa gửi đề xuất"/>
+                                    <core:Item id="prop_itmStatusA1" key="A1" text="Chờ duyệt"/>
+                                    <core:Item id="prop_itmStatusA2" key="A2" text="Duyệt thành công"/>
+                                    <core:Item id="prop_itmStatusR2" key="R2" text="Từ chối"/>
+                                </items>
+                            </Select>
+                        </HBox>
+                        <Button id="prop_btnFilter" icon="sap-icon://filter" text="Apply Filter" press="onFilter"/>
+                    </HBox>
+                </VBox>
 
-                    <headerToolbar>
-                        <Toolbar id="prop_toolbarHeader">
-                            <Title id="prop_titleHeader" text="Proposed Materials for Purchase / Production"/>
-                        </Toolbar>
-                    </headerToolbar>
+                <!-- ===== MASTER–DETAIL LAYOUT ===== -->
+                <l:ResponsiveSplitter id="prop_rspSplitter" defaultPane="prop_paneMaster" height="calc(100vh - 260px)">
+                    <l:PaneContainer id="prop_paneContainer" orientation="Horizontal">
 
-                    <columns>
-                        <Column id="prop_colMatnr"><Text id="prop_txtHdrMatnr" text="Material"/></Column>
-                        <Column id="prop_colWerks"><Text id="prop_txtHdrWerks" text="Plant"/></Column>
-                        <Column id="prop_colQty"><Text id="prop_txtHdrQty" text="Proposal Qty"/></Column>
-                        <Column id="prop_colMeins"><Text id="prop_txtHdrMeins" text="UoM"/></Column>
-                        <Column id="prop_colPeriod"><Text id="prop_txtHdrPeriod" text="Period"/></Column>
-                        <Column id="prop_colStatus"><Text id="prop_txtHdrStatus" text="Status"/></Column>
-                        <Column id="prop_colRemark"><Text id="prop_txtHdrRemark" text="Remark"/></Column>
-                    </columns>
+                        <!-- ========== MASTER TABLE ========== -->
+                        <l:SplitPane id="prop_paneMaster">
+                            <l:layoutData>
+                                <l:SplitterLayoutData id="prop_layoutMaster" size="100%" resizable="true"/>
+                            </l:layoutData>
 
-                    <items>
-                        <ColumnListItem id="prop_rowTemplate" type="Active">
-                            <cells>
-                                <Text id="prop_txtMatnr" text="{Matnr} - {MaterialName}"/>
-                                <Text id="prop_txtWerks" text="{Werks} - {PlantName}"/>
-                                <Input id="prop_inpQty" value="{Qty}" type="Number" width="90px"/>
-                                <Text id="prop_txtMeins" text="{Meins}"/>
-                                <Text id="prop_txtPeriod" text="{Period}"/>
-                                <ObjectStatus
-    id="prop_objStatus"
-    text="{path: 'Status', formatter: '.formatStatusText'}"
-    state="{path: 'Status', formatter: '.formatStatusState'}"
-    icon="{path: 'Status', formatter: '.formatStatusIcon'}"/>
+                            <VBox id="prop_vboxMaster" height="100%" fitContainer="true">
+                                <Table
+                                    id="prop_tblProposal"
+                                    mode="MultiSelect"
+                                    selectionChange=".onSelectProposal"
+                                    class="sapUiSizeCompact"
+                                    growing="false"
+                                    fixedLayout="false"
+                                    width="100%">
 
-                                <Input id="prop_inpRemark" value="{Remark}" width="200px" placeholder="Enter note..."/>
-                            </cells>
-                        </ColumnListItem>
-                    </items>
-                </Table>
-                <!-- ✅ Pagination -->
-                <HBox id="prop_boxPager" justifyContent="Center" class="sapUiMediumMarginTop">
-                    <Button id="prop_btnPrev" text="Previous" icon="sap-icon://navigation-left-arrow" press=".onPrevPage"/>
-                    <Text id="prop_txtPageInfo" text="Page 1 / 1" class="sapUiTinyMarginBegin sapUiTinyMarginEnd"/>
-                    <Button id="prop_btnNext" text="Next" icon="sap-icon://navigation-right-arrow" press=".onNextPage"/>
+                                    <headerToolbar>
+                                        <Toolbar id="prop_toolbarHeader">
+                                            <Title id="prop_titleHeader" text=" Proposed Materials" level="H2"/>
+                                            <ToolbarSpacer id="prop_spaceToolbar"/>
+                                            <SearchField id="prop_search" width="250px" liveChange="onSearch"/>
+                                        </Toolbar>
+                                    </headerToolbar>
+
+                                    <columns>
+                                        <Column id="prop_colMatnr" width="12%">
+                                            <Text id="prop_txtHdrMatnr" text="Material"/>
+                                        </Column>
+                                        <Column id="prop_colMatName" width="28%">
+                                            <Text id="prop_txtHdrMatName" text="Material Name"/>
+                                        </Column>
+                                        <Column id="prop_colWerks" width="10%">
+                                            <Text id="prop_txtHdrWerks" text="Plant"/>
+                                        </Column>
+                                        <Column id="prop_colPlantName" width="25%">
+                                            <Text id="prop_txtHdrPlantName" text="Plant Name"/>
+                                        </Column>
+                                        <Column id="prop_colPeriod" width="10%">
+                                            <Text id="prop_txtHdrPeriod" text="Period"/>
+                                        </Column>
+                                        <Column id="prop_colStatus" width="15%">
+                                            <Text id="prop_txtHdrStatus" text="Status"/>
+                                        </Column>
+                                    </columns>
+
+                                    <items>
+                                        <ColumnListItem id="prop_rowTemplate" type="Active">
+                                            <cells>
+                                                <Text id="prop_txtMatnr" text="{Matnr}"/>
+                                                <Text id="prop_txtMatName" text="{MaterialName}"/>
+                                                <Text id="prop_txtWerks" text="{Werks}"/>
+                                                <Text id="prop_txtPlantName" text="{PlantName}"/>
+                                                <Text id="prop_txtPeriod" text="{Period}"/>
+                                                <ObjectStatus
+                                                    id="prop_objStatus"
+                                                    text="{path: 'Status', formatter: '.formatter.statusText'}"
+                                                    state="{path: 'Status', formatter: '.formatter.statusState'}"/>
+                                            </cells>
+                                        </ColumnListItem>
+                                    </items>
+                                </Table>
+                            </VBox>
+                        </l:SplitPane>
+
+                        <!-- ========== DETAIL PANEL ========== -->
+                        <l:SplitPane id="prop_paneDetail">
+                            <VBox id="prop_vboxDetail" height="100%" fitContainer="true">
+                                <ScrollContainer id="prop_detailArea" visible="false" height="100%" vertical="true" horizontal="false">
+                                    <VBox id="prop_vboxDetailContent" class="sapUiSmallMargin">
+                                        <!-- Header -->
+                                        <HBox id="prop_hboxDetailHeader" justifyContent="SpaceBetween" alignItems="Center" class="sapUiSmallMarginBottom">
+                                            <Title id="prop_titleDetail" text="{Matnr} - {MaterialName}" level="H2"/>
+                                            <Button id="prop_btnCloseDetail" 
+                                                    icon="sap-icon://decline" 
+                                                    tooltip="Close detail" 
+                                                    type="Transparent" 
+                                                    press=".onCloseDetail"/>
+                                        </HBox>
+
+                                        <!-- Attributes -->
+                                        <VBox id="prop_vboxDetailAttrs" class="sapUiSmallMarginBottom">
+                                            <HBox id="prop_hboxAttrs1">
+                                                <ObjectAttribute id="prop_attrPlant" title="Plant" text="{Werks} - {PlantName}" class="sapUiSmallMarginEnd"/>
+                                            </HBox>
+                                            <HBox id="prop_hboxAttrs2">
+                                                <ObjectAttribute id="prop_attrPeriod" title="Period" text="{path:'Period',formatter:'.formatter.formatPeriod'}" class="sapUiSmallMarginEnd"/>
+                                                <ObjectAttribute id="prop_attrNetQty" title="Net Qty" text="{QtyNet}"/>
+                                            </HBox>
+                                        </VBox>
+
+                                        <!-- Form -->
+                                        <f:Form id="prop_formDetail" editable="true">
+                                            <f:title><core:Title id="prop_formTitleDetail" text="Proposal Details"/></f:title>
+                                            <f:layout>
+                                                <f:ResponsiveGridLayout id="prop_layoutFormDetail"
+                                                    labelSpanXL="4" labelSpanL="4" labelSpanM="4" labelSpanS="12"
+                                                    columnsXL="1" columnsL="1" columnsM="1"/>
+                                            </f:layout>
+
+                                            <f:formContainers>
+                                                <f:FormContainer id="prop_formContainerDetail">
+                                                    <f:formElements>
+                                                        <f:FormElement id="prop_feQtyStock" label="Stock Qty">
+                                                            <f:fields><Text id="prop_txtQtyStockDetail" text="{QtyStock}"/></f:fields>
+                                                        </f:FormElement>
+                                                        <f:FormElement id="prop_feQtyRcpt" label="Receipt Qty">
+                                                            <f:fields><Text id="prop_txtQtyRcptDetail" text="{QtyRcpt}"/></f:fields>
+                                                        </f:FormElement>
+                                                        <f:FormElement id="prop_feQtyReq" label="Req. Qty">
+                                                            <f:fields><Text id="prop_txtQtyReqDetail" text="{QtyReq}"/></f:fields>
+                                                        </f:FormElement>
+                                                        <f:FormElement id="prop_feSafetyQty" label="Safety Qty">
+                                                            <f:fields><Text id="prop_txtSafetyQtyDetail" text="{SafetyQty}"/></f:fields>
+                                                        </f:FormElement>
+                                                        <f:FormElement id="prop_feNetQty" label="Net Qty">
+                                                            <f:fields>
+                                                                <ObjectNumber id="prop_objNetQtyDetail" number="{QtyNet}"/>
+                                                            </f:fields>
+                                                        </f:FormElement>
+                                                        <f:FormElement id="prop_feProposalQty" label="Proposal Qty">
+                                                            <f:fields>
+                                                                <Input id="prop_inpQtyDetail" value="{Qty}" type="Number" width="150px"/>
+                                                            </f:fields>
+                                                        </f:FormElement>
+                                                        <f:FormElement id="prop_feUom" label="UoM">
+                                                            <f:fields>
+                                                                <Text id="prop_txtMeinsDetail" text="{Meins}"/>
+                                                            </f:fields>
+                                                        </f:FormElement>
+                                                        <f:FormElement id="prop_feStatus" label="Status">
+                                                            <f:fields>
+                                                                <ObjectStatus
+                                                                    id="prop_objStatusDetail"
+                                                                    text="{path: 'Status', formatter: '.formatter.statusText'}"
+                                                                    state="{path: 'Status', formatter: '.formatter.statusState'}"/>
+                                                            </f:fields>
+                                                        </f:FormElement>
+                                                        <f:FormElement id="prop_feRemark" label="Remark">
+                                                            <f:fields>
+                                                                <TextArea id="prop_txtRemarkDetail" value="{Remark}" rows="3" width="100%" placeholder="Enter note..."/>
+                                                            </f:fields>
+                                                        </f:FormElement>
+                                                    </f:formElements>
+                                                </f:FormContainer>
+                                            </f:formContainers>
+                                        </f:Form>
+                                    </VBox>
+                                </ScrollContainer>
+                            </VBox>
+                        </l:SplitPane>
+                    </l:PaneContainer>
+                </l:ResponsiveSplitter>
+
+                <!-- ===== PAGINATION ===== -->
+                <HBox id="prop_pagerBox" justifyContent="Center" class="sapUiSmallMarginTop">
+                    <Button id="prop_btnPrev" text="Previous" icon="sap-icon://navigation-left-arrow" press="onPrevPage"/>
+                    <HBox id="prop_pageNumbers" class="sapUiTinyMarginBegin sapUiTinyMarginEnd"/>
+                    <Button id="prop_btnNext" text="Next" icon="sap-icon://navigation-right-arrow" press="onNextPage"/>
+                </HBox>
+
+                <!-- ===== FOOTNOTE ===== -->
+                <HBox id="prop_hboxNote" justifyContent="Center" class="sapUiTinyMarginTop">
+                    <Text id="prop_txtNote" text="* Proposals generated from shortage materials (Net Qty &lt; 0)"/>
                 </HBox>
             </VBox>
         </content>

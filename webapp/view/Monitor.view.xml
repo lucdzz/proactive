@@ -6,174 +6,236 @@
     xmlns:semantic="sap.f.semantic"
     xmlns:f="sap.ui.layout.form"
     xmlns:core="sap.ui.core"
-    displayBlock="true">
+    displayBlock="true"
+    height="100%">
 
-    <Page id="pageMRP" title="MRP Monitor (UC-01)">
+    <Page id="pageMRP" title="MRP Monitor (UC-01)" enableScrolling="false">
         <!-- ===== HEADER BUTTONS ===== -->
         <headerContent>
             <Button id="btnHome" icon="sap-icon://home" text="Home" press="onNavHome"/>
             <Button id="btnRun" icon="sap-icon://refresh" text="Run Monitor" type="Emphasized" press="onRunMonitor"/>
-            <Button id="btnSave" icon="sap-icon://save" text="Save Result" press="onSaveResult"/>
             <Button id="btnExport" icon="sap-icon://excel-attachment" text="Export Excel" press="onExportExcel"/>
         </headerContent>
 
         <content>
-            <!-- ====== FILTER BAR ====== -->
-            <VBox id="boxFilter" class="sapUiSmallMargin">
-                <HBox id="hboxFilterRow" justifyContent="SpaceBetween" alignItems="Center">
-                    <Input id="inpPlant" placeholder="🏭 Select Plant..." showValueHelp="true"
-                           valueHelpRequest="onValueHelpPlant" width="220px"/>
-                    <Input id="inpMatnr" placeholder="📦 Material Number..." showValueHelp="true"
-                           valueHelpRequest="onValueHelpMaterial" width="220px"/>
-                    <HBox id="hboxPeriod" alignItems="Center">
-                        <Text id="lblPeriod" text="📅 Period:" class="sapUiTinyMarginEnd"/>
-                        <DatePicker id="dpFrom" placeholder="From" width="130px"/>
-                        <DatePicker id="dpTo" placeholder="To" width="130px" class="sapUiTinyMarginBegin"/>
-                    </HBox>
-                    <HBox id="hboxShortage" alignItems="Center">
+            <VBox id="vboxMain" height="100%" fitContainer="true">
+                <!-- ====== FILTER BAR ====== -->
+                <VBox id="boxFilter" class="sapUiSmallMargin">
+                    <HBox id="hboxFilterRow" justifyContent="SpaceBetween" alignItems="Center">
+                        <Input id="inpPlant" placeholder="Select Plant..." showValueHelp="true"
+                               valueHelpRequest="onValueHelpPlant" width="180px"/>
+                        <Input id="inpMatnr" placeholder="Material Number..." showValueHelp="true"
+                               valueHelpRequest="onValueHelpMaterial" width="180px"/>
+                        <HBox id="hboxPeriod" alignItems="Center">
+                            <Label id="lblPeriod" text="Period:" class="sapUiTinyMarginEnd"/>
+                            <DatePicker id="dpFrom" placeholder="From" width="120px"/>
+                            <DatePicker id="dpTo" placeholder="To" width="120px" class="sapUiTinyMarginBegin"/>
+                        </HBox>
                         <CheckBox id="chkShortage" text="Show only shortage" selected="false"/>
+                        <HBox id="hboxStatus" alignItems="Center">
+                            <Label id="lblStatus" text="Status:" class="sapUiTinyMarginEnd"/>
+                            <Select id="selStatusFilter" width="180px" selectedKey="ALL" change="onStatusChange">
+                                <items>
+                                    <core:Item id="itmStatusAll" key="ALL" text="All"/>
+                                    <core:Item id="itmStatusN"   key="N"   text="Chưa gửi đề xuất"/>
+                                    <core:Item id="itmStatusA1"  key="A1"  text="Chờ duyệt"/>
+                                    <core:Item id="itmStatusA2"  key="A2"  text="Duyệt thành công"/>                                   
+                                    <core:Item id="itmStatusR2"  key="R2"  text="Từ chối"/>
+                                </items>
+                            </Select>
+                        </HBox>
+                        <Button id="btnFilter" icon="sap-icon://filter" text="Apply Filter" type="Emphasized" press="onFilter"/>
                     </HBox>
-                    <Button id="btnFilter" icon="sap-icon://filter" text="Apply Filter" press="onFilter"/>
+                </VBox>
+
+                <!-- ===== MASTER–DETAIL LAYOUT ===== -->
+                <l:ResponsiveSplitter id="rspSplitterMRP" defaultPane="paneMaster" height="calc(100vh - 250px)">
+                    <l:PaneContainer id="paneContainerMRP" orientation="Horizontal">
+
+                        <!-- ========== MASTER TABLE ========== -->
+                        <l:SplitPane id="paneMaster">
+                            <l:layoutData>
+                                <l:SplitterLayoutData id="layoutMaster" size="60%" resizable="true"/>
+                            </l:layoutData>
+
+                            <VBox id="vboxMaster" height="100%" fitContainer="true">
+                                <Table id="tblMRPMaster"
+                                       mode="SingleSelectLeft"
+                                       selectionChange=".onSelectMRP"
+                                       class="sapUiSizeCompact"
+                                       growing="false"
+                                       fixedLayout="false"
+                                       width="100%">
+                                    <headerToolbar>
+                                        <OverflowToolbar id="toolbarMaster">
+                                            <Title id="titleMaster" text="Material Overview" level="H2"/>
+                                            <ToolbarSpacer id="spacerMaster"/>
+                                        </OverflowToolbar>
+                                    </headerToolbar>
+
+                                    <columns>
+                                        <Column id="colMatnrMaster" width="12%"><Text id="txtColMatnr" text="Material"/></Column>
+                                        <Column id="colMatNameMaster" width="25%"><Text id="txtColMatName" text="Material Name"/></Column>
+                                        <Column id="colWerksMaster" width="10%"><Text id="txtColWerks" text="Plant"/></Column>
+                                        <Column id="colPlantNameMaster" width="25%"><Text id="txtColPlantName" text="Plant Name"/></Column>
+                                        <Column id="colLgortMaster" width="12%"><Text id="txtColLgort" text="Storage Loc"/></Column>
+                                        <Column id="colRiskMaster" width="16%"><Text id="txtColRisk" text="Risk"/></Column>
+                                    </columns>
+
+                                    <items>
+                                        <ColumnListItem id="itemMRPMaster">
+                                            <cells>
+                                                <Text id="txtMatnrMaster" text="{Matnr}"/>
+                                                <Text id="txtMatNameMaster" text="{MaterialName}"/>
+                                                <Text id="txtWerksMaster" text="{Werks}"/>
+                                                <Text id="txtPlantNameMaster" text="{PlantName}"/>
+                                                <Text id="txtLgortMaster" text="{Lgort}"/>
+                                                <ObjectStatus id="stsRiskMaster"
+                                                              text="{path:'RiskFlag',formatter:'.formatter.riskText'}"
+                                                              state="{path:'RiskFlag',formatter:'.formatter.riskState'}"/>
+                                            </cells>
+                                        </ColumnListItem>
+                                    </items>
+                                </Table>
+                            </VBox>
+                        </l:SplitPane>
+
+                        <!-- ========== DETAIL PANEL ========== -->
+                        <l:SplitPane id="paneDetail">
+                            <VBox id="vboxDetail" height="100%" fitContainer="true">
+                                <ScrollContainer id="detailArea" visible="false" height="100%" vertical="true" horizontal="false">
+                                    <VBox id="vboxDetailContent" class="sapUiSmallMargin">
+                                        <!-- Header -->
+                                        <HBox id="hboxDetailHeader" justifyContent="SpaceBetween" alignItems="Center" class="sapUiSmallMarginBottom">
+                                            <Title id="titleDetail" text="{Matnr} - {MaterialName}" level="H2"/>
+                                            <Button id="btnCloseDetail" 
+                                                    icon="sap-icon://decline" 
+                                                    tooltip="Close detail" 
+                                                    type="Transparent" 
+                                                    press=".onCloseDetail"/>
+                                        </HBox>
+
+                                        <!-- Attributes -->
+                                        <VBox id="vboxDetailAttrs" class="sapUiSmallMarginBottom">
+                                            <HBox id="hboxAttrs1">
+                                                <ObjectAttribute id="attrPlantDetail" title="Plant" text="{Werks}" class="sapUiSmallMarginEnd"/>
+                                                <ObjectAttribute id="attrStorageDetail" title="Storage Loc" text="{Lgort}" class="sapUiSmallMarginEnd"/>
+                                            </HBox>
+                                            <HBox id="hboxAttrs2">
+                                                <ObjectAttribute id="attrPeriodDetail" title="Period" text="{path:'Period',formatter:'.formatter.formatPeriod'}" class="sapUiSmallMarginEnd"/>
+                                                <ObjectAttribute id="attrNetQtyDetail" title="Net Qty" text="{QtyNet}"/>
+                                            </HBox>
+                                        </VBox>
+
+                                        <!-- Form -->
+                                        <f:Form id="formDetail" editable="false">
+                                            <f:title><core:Title id="formTitleDetail" text="Chi tiết MRP"/></f:title>
+                                            <f:layout>
+                                                <f:ResponsiveGridLayout id="layoutFormDetail"
+                                                    labelSpanXL="4" labelSpanL="4" labelSpanM="4" labelSpanS="12"
+                                                    columnsXL="1" columnsL="1" columnsM="1"/>
+                                            </f:layout>
+
+                                            <f:formContainers>
+                                                <f:FormContainer id="formContainerDetail">
+                                                    <f:formElements>
+                                                        <f:FormElement id="feQtyStock" label="Stock Qty">
+                                                            <f:fields><Text id="txtQtyStockDetail" text="{QtyStock}"/></f:fields>
+                                                        </f:FormElement>
+                                                        <f:FormElement id="feQtyRcpt" label="Receipt Qty">
+                                                            <f:fields><Text id="txtQtyRcptDetail" text="{QtyRcpt}"/></f:fields>
+                                                        </f:FormElement>
+                                                        <f:FormElement id="feQtyReq" label="Req. Qty">
+                                                            <f:fields><Text id="txtQtyReqDetail" text="{QtyReq}"/></f:fields>
+                                                        </f:FormElement>
+                                                        <f:FormElement id="feSafetyQty" label="Safety Qty">
+                                                            <f:fields><Text id="txtSafetyQtyDetail" text="{SafetyQty}"/></f:fields>
+                                                        </f:FormElement>
+                                                        <f:FormElement id="feNetQty" label="Net Qty">
+                                                            <f:fields>
+                                                                <ObjectStatus id="stsNetQtyDetail"
+                                                                              text="{QtyNet}"
+                                                                              state="{path:'QtyNet',formatter:'.formatter.netState'}"/>
+                                                            </f:fields>
+                                                        </f:FormElement>
+                                                        <f:FormElement id="feRisk" label="Risk">
+                                                            <f:fields>
+                                                                <ObjectStatus id="stsRiskDetail"
+                                                                              text="{path:'RiskFlag',formatter:'.formatter.riskText'}"
+                                                                              state="{path:'RiskFlag',formatter:'.formatter.riskState'}"/>
+                                                            </f:fields>
+                                                        </f:FormElement>
+                                                        <f:FormElement id="feApproval" label="Approval">
+                                                            <f:fields>
+                                                                <ObjectStatus id="stsApprovalDetail"
+                                                                              text="{path:'Status',formatter:'.formatter.approvalText'}"
+                                                                              state="{path:'Status',formatter:'.formatter.approvalState'}"/>
+                                                            </f:fields>
+                                                        </f:FormElement>
+                                                    </f:formElements>
+                                                </f:FormContainer>
+                                            </f:formContainers>
+                                        </f:Form>
+                                        <!-- Transaction History -->
+                                        <Title id="titleTransHistory" text="📜 Lịch sử chứng từ (TransSet)" level="H3" class="sapUiSmallMarginTop sapUiSmallMarginBottom"/>
+                                            <Table id="tblTransDetail"
+                                                    items="{
+                                                    path: 'TransSet',
+                                                    parameters: { expand: '' }
+                                                    }"
+                                                    class="sapUiSizeCompact"
+                                                    width="100%">
+                                                <headerToolbar>
+                                                    <Toolbar id="toolbarTransDetail">
+                                                        <Title id="titleTransDetail" text="Giao dịch liên quan" level="H4"/>
+                                                    </Toolbar>
+                                                </headerToolbar>
+                                                <columns>
+                                                    <Column id="colDocType" width="10%"><Text id="txtColDocType" text="Loại chứng từ"/></Column>
+                                                    <Column id="colDocNo" width="15%"><Text id="txtColDocNo" text="Số chứng từ"/></Column>
+                                                    <Column id="colDocItem" width="8%"><Text id="txtColDocItem" text="Item"/></Column>
+                                                    <Column id="colDocDate" width="12%"><Text id="txtColDocDate" text="Ngày chứng từ"/></Column>
+                                                    <Column id="colQty" width="10%"><Text id="txtColQty" text="Số lượng"/></Column>
+                                                    <Column id="colMeins" width="8%"><Text id="txtColMeins" text="Đơn vị"/></Column>
+                                                    <Column id="colSrcTab" width="10%"><Text id="txtColSrcTab" text="Nguồn"/></Column>
+                                                    <Column id="colAeusr" width="10%"><Text id="txtColAeusr" text="Người thay đổi"/></Column>
+                                                </columns>
+
+                                                <items>
+                                                    <ColumnListItem id="itemTransDetail">
+                                                        <cells>
+                                                            <Text id="txtDocType" text="{DocType}"/>
+                                                            <Text id="txtDocNo" text="{DocNo}"/>
+                                                            <Text id="txtDocItem" text="{DocItem}"/>
+                                                            <Text id="txtDocDate" text="{path:'DocDate', type:'sap.ui.model.type.Date', formatOptions:{style:'medium'}}"/>
+                                                            <Text id="txtQty" text="{Qty}"/>
+                                                            <Text id="txtMeins" text="{Meins}"/>
+                                                            <Text id="txtSrcTab" text="{SrcTab}"/>
+                                                            <Text id="txtAeusr" text="{Aeusr}"/>
+                                                        </cells>
+                                                    </ColumnListItem>
+                                                </items>
+                                            </Table>
+                                    </VBox>
+                                </ScrollContainer>
+                            </VBox>
+                        </l:SplitPane>
+                    </l:PaneContainer>
+                </l:ResponsiveSplitter>
+
+                <!-- ===== PAGINATION ===== -->
+                <HBox id="pagerBox" justifyContent="Center" class="sapUiSmallMarginTop">
+                    <Button id="btnPrev" text="Previous" icon="sap-icon://navigation-left-arrow" press="onPrevPage"/>
+                    <!-- <Text id="txtPageInfo" text="Page 1 / 1" class="sapUiTinyMarginBegin sapUiTinyMarginEnd"/> -->
+                    <HBox id="pageNumbers" class="sapUiTinyMarginBegin sapUiTinyMarginEnd"/>
+                    <Button id="btnNext" text="Next" icon="sap-icon://navigation-right-arrow" press="onNextPage"/>
+                </HBox>
+
+                <!-- ===== FOOTNOTE ===== -->
+                <HBox id="hboxNote" justifyContent="Center" class="sapUiTinyMarginTop">
+                    <Text id="txtNote" text="* Data from OData: ZGW_MRP_MONITOR_SRV / Entity: MRPDiffSet"/>
                 </HBox>
             </VBox>
-
-            <!-- ===== MASTER–DETAIL LAYOUT ===== -->
-            <l:ResponsiveSplitter id="rspSplitterMRP" defaultPane="paneMaster">
-                <l:PaneContainer id="paneContainerMRP" orientation="Horizontal">
-
-                    <!-- ========== MASTER TABLE ========== -->
-                    <l:SplitPane id="paneMaster">
-                        <l:layoutData>
-                            <l:SplitterLayoutData id="layoutMaster" size="60%" resizable="true"/>
-                        </l:layoutData>
-
-                        <Table id="tblMRPMaster"
-                               mode="SingleSelectLeft"
-                            
-                               selectionChange=".onSelectMRP"
-                               class="sapUiSizeCompact"
-                               growing="true">
-                            <headerToolbar>
-                                <OverflowToolbar id="toolbarMaster">
-                                    <Title id="titleMaster" text="📦 Material Overview" level="H2"/>
-                                    <ToolbarSpacer id="spacerMaster"/>
-                                    <Button id="btnReloadMaster" icon="sap-icon://refresh" text="Reload" press="onRunMonitor"/>
-                                </OverflowToolbar>
-                            </headerToolbar>
-
-                            <columns>
-                                <Column id="colMatnrMaster"><Text id="txtColMatnr" text="Material"/></Column>
-                                <Column id="colMatNameMaster"><Text id="txtColMatName" text="Material Name"/></Column>
-                                <Column id="colWerksMaster"><Text id="txtColWerks" text="Plant"/></Column>
-                                 <Column id="colPlantNameMaster"><Text id="txtColPlantName" text="Plant Name"/></Column>
-                                <Column id="colLgortMaster"><Text id="txtColLgort" text="Storage Loc"/></Column>
-                                <Column id="colRiskMaster"><Text id="txtColRisk" text="Risk"/></Column>
-                            </columns>
-
-                            <items>
-                                <ColumnListItem id="itemMRPMaster">
-                                    <cells>
-                                        <Text id="txtMatnrMaster" text="{Matnr}"/>
-                                        <Text id="txtMatNameMaster" text="{MaterialName}"/>
-                                        <Text id="txtWerksMaster" text="{Werks}"/>
-                                        <Text id="txtPlantNameMaster" text="{PlantName}"/>
-                                        <Text id="txtLgortMaster" text="{Lgort}"/>
-                                        <ObjectStatus id="stsRiskMaster"
-                                                      text="{path:'RiskFlag',formatter:'.formatter.riskText'}"
-                                                      state="{path:'RiskFlag',formatter:'.formatter.riskState'}"/>
-                                    </cells>
-                                </ColumnListItem>
-                            </items>
-                        </Table>
-                    </l:SplitPane>
-
-                    <!-- ========== DETAIL PANEL ========== -->
-                    <l:SplitPane id="paneDetail">
-                        <semantic:SemanticPage id="detailArea" visible="false">
-                            <semantic:titleHeading>
-                                <Title id="titleDetail" text="{Matnr} - {MaterialName}" level="H2"/>
-                            </semantic:titleHeading>
-
-                            <semantic:headerContent>
-                                <FlexBox id="boxHeaderDetail" wrap="Wrap">
-                                    <ObjectAttribute id="attrPlantDetail" title="Plant" text="{Werks}"/>
-                                    <ObjectAttribute id="attrStorageDetail" title="Storage Loc" text="{Lgort}"/>
-                                    <ObjectAttribute id="attrPeriodDetail" title="Period" text="{Period}"/>
-                                    <ObjectAttribute id="attrNetQtyDetail" title="Net Qty" text="{QtyNet}"/>
-                                </FlexBox>
-                                <Button id="btnCloseDetail" 
-                                        icon="sap-icon://decline" 
-                                        tooltip="Close detail" 
-                                        type="Transparent" 
-                                        press=".onCloseDetail"/>
-                            </semantic:headerContent>
-
-                            <semantic:content>
-                                <f:Form id="formDetail" editable="false">
-                                    <f:title><core:Title id="formTitleDetail" text="Chi tiết MRP"/></f:title>
-                                    <f:layout>
-                                        <f:ResponsiveGridLayout id="layoutFormDetail"
-                                            labelSpanXL="3" labelSpanL="3" labelSpanM="3" labelSpanS="12"
-                                            columnsXL="1" columnsL="1" columnsM="1"/>
-                                    </f:layout>
-
-                                    <f:formContainers>
-                                        <f:FormContainer id="formContainerDetail">
-                                            <f:formElements>
-                                                <f:FormElement id="feQtyStock" label="Stock Qty">
-                                                    <f:fields><Text id="txtQtyStockDetail" text="{QtyStock}"/></f:fields>
-                                                </f:FormElement>
-                                                <f:FormElement id="feQtyRcpt" label="Receipt Qty">
-                                                    <f:fields><Text id="txtQtyRcptDetail" text="{QtyRcpt}"/></f:fields>
-                                                </f:FormElement>
-                                                <f:FormElement id="feQtyReq" label="Req. Qty">
-                                                    <f:fields><Text id="txtQtyReqDetail" text="{QtyReq}"/></f:fields>
-                                                </f:FormElement>
-                                                <f:FormElement id="feSafetyQty" label="Safety Qty">
-                                                    <f:fields><Text id="txtSafetyQtyDetail" text="{SafetyQty}"/></f:fields>
-                                                </f:FormElement>
-                                                <f:FormElement id="feNetQty" label="Net Qty">
-                                                    <f:fields>
-                                                        <ObjectStatus id="stsNetQtyDetail"
-                                                                      text="{QtyNet}"
-                                                                      state="{path:'QtyNet',formatter:'.formatter.netState'}"/>
-                                                    </f:fields>
-                                                </f:FormElement>
-                                                <f:FormElement id="feRisk" label="Risk">
-                                                    <f:fields>
-                                                        <ObjectStatus id="stsRiskDetail"
-                                                                      text="{path:'RiskFlag',formatter:'.formatter.riskText'}"
-                                                                      state="{path:'RiskFlag',formatter:'.formatter.riskState'}"/>
-                                                    </f:fields>
-                                                </f:FormElement>
-                                                <f:FormElement id="feApproval" label="Approval">
-                                                    <f:fields>
-                                                        <ObjectStatus id="stsApprovalDetail"
-                                                                      text="{path:'Status',formatter:'.formatter.approvalText'}"
-                                                                      state="{path:'Status',formatter:'.formatter.approvalState'}"/>
-                                                    </f:fields>
-                                                </f:FormElement>
-                                            </f:formElements>
-                                        </f:FormContainer>
-                                    </f:formContainers>
-                                </f:Form>
-                            </semantic:content>
-                        </semantic:SemanticPage>
-                    </l:SplitPane>
-                </l:PaneContainer>
-            </l:ResponsiveSplitter>
-
-            <!-- ===== PAGINATION ===== -->
-            <HBox id="pagerBox" justifyContent="Center" class="sapUiMediumMarginTop">
-                <Button id="btnPrev" text="Previous" icon="sap-icon://navigation-left-arrow" press="onPrevPage"/>
-                <Text id="txtPageInfo" text="Page 1 / 1" class="sapUiTinyMarginBegin sapUiTinyMarginEnd"/>
-                <Button id="btnNext" text="Next" icon="sap-icon://navigation-right-arrow" press="onNextPage"/>
-            </HBox>
-
-            <!-- ===== FOOTNOTE ===== -->
-            <HBox id="hboxNote" justifyContent="Center" class="sapUiSmallMarginTop">
-                <Text id="txtNote" text="* Data from OData: ZGW_MRP_MONITOR_SRV / Entity: MRPDiffSet"/>
-            </HBox>
         </content>
     </Page>
 </mvc:View>

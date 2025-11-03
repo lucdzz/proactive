@@ -23,7 +23,7 @@
                   alignItems="Center"
                   class="sapUiLargeMarginBottom sapUiMediumMarginTop">
 
-                <!-- KPI 1️⃣ -->
+                <!-- KPI -->
                 <GenericTile id="tileMonitor"
                              header="Theo dõi Tồn kho &amp; Nhu cầu (UC-01)"
                              subheader="Stock &amp; Demand Monitor"
@@ -40,7 +40,7 @@
                     </TileContent>
                 </GenericTile>
 
-                <!-- KPI 2️⃣ -->
+                <!-- KPI -->
                 <GenericTile id="tileForecast"
                              header="Dự báo Nhu cầu (UC-02)"
                              subheader="Forecast Accuracy"
@@ -57,7 +57,7 @@
                     </TileContent>
                 </GenericTile>
 
-                <!-- KPI 3️⃣ -->
+                <!-- KPI -->
                 <GenericTile id="tileProposal"
                              header="Đề xuất Mua hàng / SX (UC-03)"
                              subheader="Generated Proposals"
@@ -74,7 +74,7 @@
                     </TileContent>
                 </GenericTile>
 
-                <!-- KPI 4️⃣ -->
+                <!-- KPI -->
                 <GenericTile id="tileApproval"
                              header="Yêu cầu Phê duyệt (UC-04)"
                              subheader="Pending Approvals"
@@ -92,7 +92,7 @@
                 </GenericTile>
             </HBox>
 
-            <!-- 🔹 Biểu đồ phân tích -->
+            <!-- Biểu đồ phân tích -->
             <Panel id="panelTrend" headerText="Phân tích Xu hướng Tồn kho" expandable="true" expanded="true">
                 <VBox id="boxTrend" class="sapUiMediumMargin">
                     <viz:VizFrame id="vizStockTrend"
@@ -121,7 +121,7 @@
                 </VBox>
             </Panel>
 
-            <!-- 🔹 Footer -->
+            <!-- Footer -->
             <Toolbar id="toolbarFooter" design="Transparent" class="sapUiTinyMarginTop">
                 <Title id="footerTitle" text="Proactive MRP System © 2025 — Integrated with ZGW_MRP_MONITOR_SRV" level="H6"/>
                 <ToolbarSpacer id="footerSpacer"/>

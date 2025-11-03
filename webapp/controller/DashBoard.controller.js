@@ -116,13 +116,13 @@ sap.ui.define([
             const that = this;
 
             if (!oModel) {
-                console.warn("⚠️ OData model not found!");
+                console.warn(" OData model not found!");
                 return;
             }
 
             sap.ui.core.BusyIndicator.show(0);
 
-            // 1️⃣ Đọc tồn kho thực tế từ MRPDiffSet
+            //  Đọc tồn kho thực tế từ MRPDiffSet
             const p1 = new Promise(function (resolve, reject) {
                 oModel.read("/MRPDiffSet", {
                     success: function (oData) {
@@ -139,7 +139,7 @@ sap.ui.define([
                 });
             });
 
-            // 2️⃣ Đọc forecast từ ForecastSet
+            //  Đọc forecast từ ForecastSet
             const p2 = new Promise(function (resolve, reject) {
                 oModel.read("/ForecastSet", {
                     success: function (oData) {
@@ -156,7 +156,7 @@ sap.ui.define([
                 });
             });
 
-            // 3️⃣ Gộp 2 nguồn thành 1 dataset cho chart
+            //  Gộp 2 nguồn thành 1 dataset cho chart
             Promise.all([p1, p2]).then(([mapActual, mapForecast]) => {
                 const allPeriods = Array.from(new Set([
                     ...Object.keys(mapActual),
@@ -173,12 +173,12 @@ sap.ui.define([
                 that.getView().setModel(oJSON);
 
                 sap.ui.core.BusyIndicator.hide();
-                MessageToast.show("✅ Loaded chart data (" + aData.length + " periods)");
-                console.log("📊 Chart Data:", aData);
+                MessageToast.show(" Loaded chart data (" + aData.length + " periods)");
+                console.log(" Chart Data:", aData);
             }).catch(err => {
                 sap.ui.core.BusyIndicator.hide();
-                console.error("❌ Failed to load chart data", err);
-                MessageToast.show("❌ Failed to load chart data!");
+                console.error(" Failed to load chart data", err);
+                MessageToast.show(" Failed to load chart data!");
             });
         },
 
@@ -187,7 +187,7 @@ sap.ui.define([
             const that = this;
 
             if (!oModel) {
-                console.warn("⚠️ OData model not found!");
+                console.warn(" OData model not found!");
                 return;
             }
 
@@ -238,12 +238,12 @@ sap.ui.define([
                     that.byId("numProposal").setValue(countProposal).setValueColor(countProposal > 0 ? "Critical" : "Neutral");
                     that.byId("numApproval").setValue(countApproval).setValueColor(countApproval > 0 ? "Error" : "Neutral");
 
-                    console.log("✅ KPI loaded:", { countDiff, forecastAcc, countProposal, countApproval });
+                    console.log(" KPI loaded:", { countDiff, forecastAcc, countProposal, countApproval });
                 })
                 .catch(err => {
                     sap.ui.core.BusyIndicator.hide();
-                    console.error("❌ KPI load failed:", err);
-                    sap.m.MessageToast.show("❌ Failed to load KPI data!");
+                    console.error(" KPI load failed:", err);
+                    sap.m.MessageToast.show(" Failed to load KPI data!");
                 });
         },
 
@@ -252,7 +252,7 @@ sap.ui.define([
         // =========================================================
         onLogout: function () {
             // 🔹 Xác nhận trước khi đăng xuất
-            MessageBox.confirm("Bạn có chắc chắn muốn đăng xuất?", {  // ✅ dùng MessageBox (đã import)
+            MessageBox.confirm("Bạn có chắc chắn muốn đăng xuất?", {  //  dùng MessageBox (đã import)
                 title: "Đăng xuất",
                 actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
                 emphasizedAction: MessageBox.Action.OK,
@@ -263,7 +263,7 @@ sap.ui.define([
                         localStorage.removeItem("MRP_ROLE");
                         localStorage.removeItem("MRP_FULLNAME");
 
-                        MessageToast.show("🚪 Đã đăng xuất khỏi hệ thống!");
+                        MessageToast.show(" Đã đăng xuất khỏi hệ thống!");
 
                         // 🔹 Chuyển về màn hình Login
                         const oRouter = sap.ui.core.UIComponent.getRouterFor(this);
@@ -290,7 +290,7 @@ sap.ui.define([
         },
 
         onRefreshKPI: function () {
-            MessageToast.show("🔄 Refreshing KPI & chart...");
+            MessageToast.show(" Refreshing KPI & chart...");
             this._loadKPIData();
             this._loadChartData();
         }

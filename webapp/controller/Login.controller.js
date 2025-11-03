@@ -17,7 +17,7 @@ sap.ui.define([
             }
 
             // 🔹 Bật mock mode nếu không kết nối được OData
-            const bMockMode = true; // 👉 đổi về false khi deploy lên SAP
+            const bMockMode = true; // đổi về false khi deploy lên SAP
             if (bMockMode) {
                 const aMockUsers = [
                     {
@@ -39,13 +39,13 @@ sap.ui.define([
                 const oMockModel = new JSONModel({ results: aMockUsers });
                 const oData = oMockModel.getData();
 
-                // ✅ Mô phỏng kiểm tra login
+                // Mô phỏng kiểm tra login
                 const user = oData.results.find(u => u.Username === sUser && u.Password === sPass);
 
                 BusyIndicator.hide();
 
                 if (!user) {
-                    return MessageToast.show("⚠️ Sai tài khoản hoặc mật khẩu!");
+                    return MessageToast.show(" Sai tài khoản hoặc mật khẩu!");
                 }
 
                 // 🔹 Lưu thông tin user vào localStorage
@@ -53,7 +53,7 @@ sap.ui.define([
                 localStorage.setItem("MRP_ROLE", user.Role);
                 localStorage.setItem("MRP_FULLNAME", user.Fullname);
 
-                MessageToast.show(`✅ Xin chào ${user.Fullname}!`);
+                MessageToast.show(` Xin chào ${user.Fullname}!`);
                 this.getOwnerComponent().getRouter().navTo("DashBoard");
                 return;
             }
@@ -85,7 +85,7 @@ sap.ui.define([
                 error: (err) => {
                     BusyIndicator.hide();
                     console.error("Login OData Error:", err);
-                    MessageToast.show("❌ Không thể kết nối đến OData Service!", { at: "center center" });
+                    MessageToast.show(" Không thể kết nối đến OData Service!", { at: "center center" });
                 }
             });
         }

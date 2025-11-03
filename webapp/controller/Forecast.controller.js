@@ -18,6 +18,8 @@ sap.ui.define([
             this.oModel = this.getOwnerComponent().getModel();
             this.oTable = this.byId("fcst_tblForecast");
 
+            const oDetail = this.byId("fcst_detailPage");
+            if (oDetail) oDetail.setVisible(false);
             const that = this;
             this.oModel.metadataLoaded().then(function () {
                 that._loadPlantAndMaterialCache();
@@ -33,15 +35,21 @@ sap.ui.define([
             const sMethod = this.byId("fcst_selMethod").getSelectedKey();
             const sPeriod = this.byId("fcst_selPeriod").getSelectedKey();
 
+            const oDetail = this.byId("fcst_detailPage");
+            const oLayout = this.byId("fcst_layoutMaster");
+            if (oDetail) {
+                oDetail.setVisible(false);
+                oLayout.setSize("100%");
+            }
             sap.ui.core.BusyIndicator.show(0);
 
-            // ✅ Luôn reload full từ backend
+            // Luôn reload full từ backend
             this.oModel.read("/ForecastSet", {
                 success: function (oData) {
                     sap.ui.core.BusyIndicator.hide();
 
                     if (!oData.results || oData.results.length === 0) {
-                        MessageToast.show("⚠️ No forecast data found!");
+                        MessageToast.show("No forecast data found!");
                         that._aForecastData = [];
                         that._updatePage();
                         return;
@@ -58,7 +66,7 @@ sap.ui.define([
                 },
                 error: function (oError) {
                     sap.ui.core.BusyIndicator.hide();
-                    console.error("❌ Forecast OData error", oError);
+                    console.error("Forecast OData error", oError);
                     sap.m.MessageBox.error("Failed to load forecast data.");
                 }
             });
@@ -75,7 +83,7 @@ sap.ui.define([
             this._totalPages = Math.max(1, Math.ceil(aFiltered.length / this._pageSize));
 
             this._updatePage();
-            MessageToast.show(`✅ Filtered ${aFiltered.length} records (Method: ${sMethod})`);
+            MessageToast.show(`Filtered ${aFiltered.length} records (Method: ${sMethod})`);
         },
 
         // =========================================================
@@ -104,7 +112,7 @@ sap.ui.define([
             const sPeriod = this.byId("fcst_selPeriod").getSelectedKey();
 
             MessageToast.show(`🔄 Reloading forecast (${sMethod}, ${sPeriod})...`);
-            // ✅ Gọi lại full OData mỗi lần đổi dropdown
+            //Gọi lại full OData mỗi lần đổi dropdown
             this._autoLoadForecast(true); // truyền cờ "true" để báo là reload full
         },
 
@@ -112,7 +120,7 @@ sap.ui.define([
         // SAVE FORECAST (placeholder)
         // =========================================================
         onSaveForecast: function () {
-            MessageToast.show("💾 Forecast saved to ZTB_MRP_FCST (stub).");
+            MessageToast.show("Forecast saved to ZTB_MRP_FCST (stub).");
         },
 
         // =========================================================
@@ -138,12 +146,10 @@ sap.ui.define([
         // =========================================================
         _updatePage: function () {
             const oTable = this.byId("fcst_tblForecast");
-
-            // 🔸 Luôn dùng dữ liệu từ cache _aForecastData, không lấy từ model
             if (!this._aForecastData || this._aForecastData.length === 0) {
-                this.byId("fcst_txtPageInfo").setText("No data");
                 oTable.unbindItems();
                 oTable.setModel(new JSONModel([]));
+                this._renderPagination(); // clear pagination
                 return;
             }
 
@@ -151,17 +157,65 @@ sap.ui.define([
             const iEnd = iStart + this._pageSize;
             const aPageData = this._aForecastData.slice(iStart, iEnd);
 
-            // ✅ Cập nhật Page Info trước khi bind
-            this.byId("fcst_txtPageInfo").setText(`Page ${this._currentPage} / ${this._totalPages}`);
+            const oTemplate = new sap.m.ColumnListItem({
+                cells: [
+                    new sap.m.Text({ text: "{Matnr}" }),
+                    new sap.m.Text({ text: "{MaterialName}" }),
+                    new sap.m.Text({ text: "{Werks}" }),
+                    new sap.m.Text({ text: "{PlantName}" }),
+                    new sap.m.Text({ text: "{Period}" }),
+                    new sap.m.Text({ text: "{Method}" })
+                ]
+            });
 
-            // ✅ Luôn clone template gốc, tránh reuse context cũ
-            const oTemplate = this.byId("fcst_rowTemplate").clone();
-
-            // ⚡️ Bind dữ liệu mới
             const oJSON = new JSONModel(aPageData);
             oTable.setModel(oJSON);
             oTable.unbindItems();
             oTable.bindItems("/", oTemplate);
+
+            this._renderPagination(); //render lại thanh số trang
+        },
+        _renderPagination: function () {
+            const oHBox = this.byId("fcst_pageNumbers");
+            if (!oHBox) return;
+            oHBox.removeAllItems();
+
+            const totalPages = this._totalPages || 1;
+            const current = this._currentPage;
+
+            // Ẩn/hiện nút Previous / Next
+            this.byId("fcst_btnPrev").setVisible(current > 1);
+            this.byId("fcst_btnNext").setVisible(current < totalPages);
+
+            const createButton = (num, active = false) => {
+                return new sap.m.Button({
+                    text: num.toString(),
+                    type: active ? "Emphasized" : "Transparent",
+                    press: () => {
+                        this._currentPage = num;
+                        this._updatePage();
+                    }
+                }).addStyleClass("sapUiTinyMarginBegin sapUiTinyMarginEnd");
+            };
+
+            // Hiển thị 5 nút xung quanh current
+            let start = Math.max(1, current - 2);
+            let end = Math.min(totalPages, start + 4);
+            if (end - start < 4) start = Math.max(1, end - 4);
+
+            if (start > 1) {
+                oHBox.addItem(createButton(1));
+                if (start > 2) oHBox.addItem(new sap.m.Text({ text: "..." }));
+            }
+
+            for (let i = start; i <= end; i++) {
+                oHBox.addItem(createButton(i, i === current));
+            }
+
+            if (end < totalPages) {
+                if (end < totalPages - 1) oHBox.addItem(new sap.m.Text({ text: "..." }));
+                oHBox.addItem(createButton(totalPages));
+            }
         },
 
         _loadPlantAndMaterialCache: function () {
@@ -171,20 +225,20 @@ sap.ui.define([
             oModel.read("/PlantSet", {
                 success: function (oData) {
                     that._oPlantCache = new JSONModel(oData.results);
-                    console.log("✅ Cached PlantSet:", oData.results.length);
+                    console.log("Cached PlantSet:", oData.results.length);
                 },
                 error: function (err) {
-                    console.error("❌ Failed to load PlantSet", err);
+                    console.error("Failed to load PlantSet", err);
                 }
             });
 
             oModel.read("/MaterialSet", {
                 success: function (oData) {
                     that._oMaterialCache = new JSONModel(oData.results);
-                    console.log("✅ Cached MaterialSet:", oData.results.length);
+                    console.log("Cached MaterialSet:", oData.results.length);
                 },
                 error: function (err) {
-                    console.error("❌ Failed to load MaterialSet", err);
+                    console.error("Failed to load MaterialSet", err);
                 }
             });
         },
@@ -202,6 +256,36 @@ sap.ui.define([
                     MaterialName: oMat ? oMat.Maktx : ""
                 };
             });
+        },
+
+        onSelectForecast: function (oEvent) {
+            const oListItem = oEvent.getParameter("listItem");
+            if (!oListItem) return; //Không có selection thực tế
+
+            const oContext = oListItem.getBindingContext();
+            if (!oContext) return;
+
+            const oDetail = this.byId("fcst_detailPage");
+            const oLayout = this.byId("fcst_layoutMaster");
+
+            // Hiển thị detail chỉ khi có user action
+            if (!oDetail.getVisible()) {
+                oDetail.setVisible(true);
+                oLayout.setSize("60%");
+            }
+
+            oDetail.setModel(this.byId("fcst_tblForecast").getModel());
+            oDetail.setBindingContext(oContext);
+        },
+
+        onCloseDetail: function () {
+            const oDetail = this.byId("fcst_detailPage");
+            const oLayout = this.byId("fcst_layoutMaster");
+            const oTable = this.byId("fcst_tblForecast");
+
+            oDetail.setVisible(false);
+            oLayout.setSize("100%");
+            if (oTable) oTable.removeSelections();
         },
 
         onNextPage: function () {

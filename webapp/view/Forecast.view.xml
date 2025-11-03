@@ -1,77 +1,149 @@
-<mvc:View controllerName="zpg.mrp.ui.controller.Forecast"
-
+<mvc:View
+    controllerName="zpg.mrp.ui.controller.Forecast"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
+    xmlns:l="sap.ui.layout"
+    xmlns:f="sap.ui.layout.form"
     xmlns:core="sap.ui.core"
     displayBlock="true">
 
     <Page id="fcst_pageMain" title="Forecast Demand (UC-02)">
+        <!-- HEADER BUTTONS -->
         <headerContent>
-            <Button id="fcst_btnBack" icon="sap-icon://home" text="Home" press="onNavHome"/>
-            <Button id="fcst_btnRunForecast" icon="sap-icon://synchronize" text="Run Forecast" type="Emphasized" press="onRunForecast"/>
-            <Button id="fcst_btnSaveForecast" icon="sap-icon://save" text="Save" press="onSaveForecast"/>
-            <!-- <Button id="fcst_btnProposal" icon="sap-icon://create-form" text="Generate Proposal" press="onNavProposal"/> -->
+            <Button id="fcst_btnHome" icon="sap-icon://home" text="Home" press="onNavHome"/>
+            <Button id="fcst_btnRun" icon="sap-icon://synchronize" text="Run Forecast" type="Emphasized" press="onRunForecast"/>
+            <Button id="fcst_btnSave" icon="sap-icon://save" text="Save" press="onSaveForecast"/>
         </headerContent>
 
         <content>
-            <VBox id="fcst_boxMain" class="sapUiSmallMargin">
-                <!-- Bộ lọc -->
-                <HBox id="fcst_boxFilter" alignItems="Center" justifyContent="Start" class="sapUiTinyMarginBottom">
-                    <Select id="fcst_selMethod" width="200px" selectedKey="MA" change="onMethodChange">
-                        <core:Item id="fcst_itmMA" key="MA" text="Moving Average"/>
-                        <core:Item id="fcst_itmWA" key="WA" text="Weighted Average"/>
-                        <core:Item id="fcst_itmAR" key="AR" text="ARIMA (coming soon)"/>
-                    </Select>
+            <!-- SPLITTER giống Monitor -->
+            <l:ResponsiveSplitter id="fcst_splitter" defaultPane="fcst_paneMaster">
+                <l:PaneContainer id="fcst_container" orientation="Horizontal">
 
-                    <Select id="fcst_selPeriod" width="150px" selectedKey="M" change="onMethodChange">
-                        <core:Item id="fcst_itmMonth" key="M" text="Month"/>
-                        <core:Item id="fcst_itmWeek" key="W" text="Week"/>
-                    </Select>
+                    <!-- ========== MASTER LIST ========== -->
+                    <l:SplitPane id="fcst_paneMaster">
+                        <l:layoutData>
+                            <l:SplitterLayoutData id="fcst_layoutMaster" size="60%" resizable="true"/>
+                        </l:layoutData>
 
-                    <Button id="fcst_btnSimulate" icon="sap-icon://simulate" text="Simulate" press="onSimulate"/>
-                </HBox>
+                        <VBox id="fcst_boxMain" class="sapUiSmallMargin">
+                            <!-- FILTER -->
+                            <HBox id="fcst_boxFilter" alignItems="Center" class="sapUiTinyMarginBottom">
+                                <Select id="fcst_selMethod" width="200px" selectedKey="MA" change="onMethodChange">
+                                    <core:Item id="fcst_itmMA" key="MA" text="Moving Average"/>
+                                    <core:Item id="fcst_itmWA" key="WA" text="Weighted Average"/>
+                                </Select>
+                                <Select id="fcst_selPeriod" width="150px" selectedKey="M" change="onMethodChange">
+                                    <core:Item id="fcst_itmMonth" key="M" text="Month"/>
+                                    <core:Item id="fcst_itmWeek" key="W" text="Week"/>
+                                </Select>
+                                <Button id="fcst_btnSimulate" icon="sap-icon://simulate" text="Simulate" press="onSimulate"/>
+                            </HBox>
 
-                <!-- Bảng kết quả -->
-                <Table id="fcst_tblForecast" inset="false" width="100%">
-    <headerToolbar>
-        <Toolbar id="fcst_toolbarHeader">
-            <Title id="fcst_titleHeader" text="Forecast History &amp; Result"/>
-        </Toolbar>
-    </headerToolbar>
+                            <!-- TABLE -->
+                            <Table id="fcst_tblForecast"
+                                   mode="SingleSelectLeft"
+                                   selectionChange="onSelectForecast"
+                                   width="100%">
+                                <headerToolbar>
+                                    <Toolbar id="fcst_toolbarHeader">
+                                        <Title id="fcst_titleHeader" text="Forecast History &amp; Result"/>
+                                    </Toolbar>
+                                </headerToolbar>
 
-    <columns>
-        <Column id="fcst_colMatnr"><Text id="fcst_txtHdrMatnr" text="Material"/></Column>
-        <Column id="fcst_colWerks"><Text id="fcst_txtHdrWerks" text="Plant"/></Column>
-        <Column id="fcst_colPeriod"><Text id="fcst_txtHdrPeriod" text="Period"/></Column>
-        <Column id="fcst_colMethod"><Text id="fcst_txtHdrMethod" text="Method"/></Column>
-        <Column id="fcst_colWindow"><Text id="fcst_txtHdrWindow" text="Month"/></Column>
-        <Column id="fcst_colQty"><Text id="fcst_txtHdrQty" text="Forecast Qty"/></Column>
-        <Column id="fcst_colAedat"><Text id="fcst_txtHdrAedat" text="Changed On"/></Column>
-    </columns>
+                                <columns>
+                                    <Column id="fcst_colMatnr"><Text id="fcst_txtHdrMatnr" text="Material"/></Column>
+                                    <Column id="fcst_colMatName"><Text id="fcst_txtHdrMatName" text="Material Name"/></Column>
+                                    <Column id="fcst_colWerks"><Text id="fcst_txtHdrWerks" text="Plant"/></Column>
+                                    <Column id="fcst_colPlantName"><Text id="fcst_txtHdrPlantName" text="Plant Name"/></Column>
+                                    <Column id="fcst_colPeriod"><Text id="fcst_txtHdrPeriod" text="Period"/></Column>
+                                    <Column id="fcst_colMethod"><Text id="fcst_txtHdrMethod" text="Method"/></Column>
+                                </columns>
 
-    <!-- Template cho từng dòng -->
-    <items>
-        <ColumnListItem id="fcst_rowTemplate">
-            <cells>
-                <Text id="fcst_txtMatnr" text="{Matnr} - {MaterialName}"/>
-                <Text id="fcst_txtWerks" text="{Werks} - {PlantName}"/>
-                <Text id="fcst_txtPeriod" text="{Period}"/>
-                <Text id="fcst_txtMethod" text="{Method}"/>
-                <Text id="fcst_txtWindow" text="{Window}"/>
-                <Text id="fcst_txtFcstQty" text="{FcstQty}"/>
-                <Text id="fcst_txtAedat" text="{Aedat}"/>
-                        </cells>
-                        </ColumnListItem>
-    </items>
-                </Table>
-            </VBox>
-            <!-- ✅ Phân trang -->
-<HBox id="fcst_boxPager" justifyContent="Center" class="sapUiMediumMarginTop">
-    <Button id="fcst_btnPrev" text="Previous" icon="sap-icon://navigation-left-arrow" press="onPrevPage"/>
-    <Text id="fcst_txtPageInfo" text="Page 1 / 1" class="sapUiTinyMarginBegin sapUiTinyMarginEnd"/>
-    <Button id="fcst_btnNext" text="Next" icon="sap-icon://navigation-right-arrow" press="onNextPage"/>
-</HBox>
+                                <items>
+                                    <ColumnListItem id="fcst_rowTemplate">
+                                        <cells>
+                                            <Text id="fcst_txtMatnr" text="{Matnr}"/>
+                                            <Text id="fcst_txtMatName" text="{MaterialName}"/>
+                                            <Text id="fcst_txtWerks" text="{Werks}"/>
+                                            <Text id="fcst_txtPlantName" text="{PlantName}"/>
+                                            <Text id="fcst_txtPeriod" text="{Period}"/>
+                                            <Text id="fcst_txtMethod" text="{Method}"/>
+                                        </cells>
+                                    </ColumnListItem>
+                                </items>
+                            </Table>
+                        </VBox>
+                    </l:SplitPane>
 
+                    <!-- ========== DETAIL PANEL ========== -->
+                    <l:SplitPane id="fcst_paneDetail">
+                        <Page id="fcst_detailPage" visible="false">
+                            <headerContent>
+                                <Button id="fcst_btnCloseDetail"
+                                        icon="sap-icon://decline"
+                                        tooltip="Close Detail"
+                                        press="onCloseDetail"/>
+                            </headerContent>
+
+                            <content>
+                                <f:Form id="fcst_formDetail" editable="false">
+                                    <f:title>
+                                        <core:Title id="fcst_formTitle" text="Forecast Detail"/>
+                                    </f:title>
+                                    <f:layout>
+                                        <f:ResponsiveGridLayout
+                                            id="fcst_layoutDetail"
+                                            labelSpanXL="3" labelSpanL="3" labelSpanM="3" labelSpanS="12"
+                                            columnsXL="1" columnsL="1" columnsM="1"/>
+                                    </f:layout>
+                                    <f:formContainers>
+                                        <f:FormContainer id="fcst_formContainer">
+                                            <f:formElements>
+                                                <f:FormElement id="fcst_feMatnr" label="Material">
+                                                    <f:fields><Text id="fcst_txtMatnrDetail" text="{Matnr}"/></f:fields>
+                                                </f:FormElement>
+                                                <f:FormElement id="fcst_feMatName" label="Material Name">
+                                                    <f:fields><Text id="fcst_txtMatNameDetail" text="{MaterialName}"/></f:fields>
+                                                </f:FormElement>
+                                                <f:FormElement id="fcst_fePlant" label="Plant">
+                                                    <f:fields><Text id="fcst_txtWerksDetail" text="{Werks} - {PlantName}"/></f:fields>
+                                                </f:FormElement>
+                                                <f:FormElement id="fcst_fePeriod" label="Forecast Period">
+                                                    <f:fields><Text id="fcst_txtPeriodDetail" text="{Period}"/></f:fields>
+                                                </f:FormElement>
+                                                <f:FormElement id="fcst_feMethod" label="Method">
+                                                    <f:fields><Text id="fcst_txtMethodDetail" text="{Method}"/></f:fields>
+                                                </f:FormElement>
+                                                <f:FormElement id="fcst_feQty" label="Forecast Qty">
+                                                    <f:fields>
+                                                        <ObjectStatus id="fcst_stsQty" text="{FcstQty}" state="{= ${FcstQty} > 0 ? 'Success' : 'Error'}"/>
+                                                    </f:fields>
+                                                </f:FormElement>
+                                                <f:FormElement id="fcst_feAedat" label="Changed On">
+                                                    <f:fields><Text id="fcst_txtAedat" text="{Aedat}"/></f:fields>
+                                                </f:FormElement>
+                                                <f:FormElement id="fcst_feAeusr" label="Changed By">
+                                                    <f:fields><Text id="fcst_txtAeusr" text="{Aeusr}"/></f:fields>
+                                                </f:FormElement>
+                                            </f:formElements>
+                                        </f:FormContainer>
+                                    </f:formContainers>
+                                </f:Form>
+                            </content>
+                        </Page>
+                    </l:SplitPane>
+
+                </l:PaneContainer>
+            </l:ResponsiveSplitter>
+
+            <!-- Pagination -->
+            <HBox id="fcst_boxPager" justifyContent="Center" class="sapUiMediumMarginTop">
+                <Button id="fcst_btnPrev" text="Previous" icon="sap-icon://navigation-left-arrow" press="onPrevPage"/>
+                <HBox id="fcst_pageNumbers" class="sapUiTinyMarginBegin sapUiTinyMarginEnd"/>
+                <!-- <Text id="fcst_txtPageInfo" text="Page 1 / 1" class="sapUiTinyMarginBegin sapUiTinyMarginEnd"/> -->
+                <Button id="fcst_btnNext" text="Next" icon="sap-icon://navigation-right-arrow" press="onNextPage"/>
+            </HBox>
         </content>
     </Page>
 </mvc:View>

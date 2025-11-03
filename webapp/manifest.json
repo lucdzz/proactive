@@ -62,6 +62,7 @@
     "models": {
       "i18n": {
         "type": "sap.ui.model.resource.ResourceModel",
+        "preload": true,
         "settings": {
           "bundleName": "zpg.mrp.ui.i18n.i18n"
         }
